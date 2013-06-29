@@ -1,0 +1,61 @@
+#! /usr/bin/python2.7
+import os
+import os.path
+import imp
+import json
+import sys
+from otto.cmds import DEFAULT_CMDS
+import pprint as pp
+
+USAGE = """Usage:
+  $ otto COMMAND [ARG1 ARG2 ... ARGN]"""
+
+DEBUG = True
+DEFAULT_CONFIG = {}
+LOCAL_CMDS_DIR = os.path.join(os.getcwd(), '.otto')
+LOCAL_CONFIG = os.path.join(LOCAL_CMDS_DIR, 'config.json')
+
+class OttoDispatcher(object):
+    def __init__(self):
+        self.config = DEFAULT_CONFIG
+        self.cmds = DEFAULT_CMDS
+
+        self.local_config()
+        self.local_cmds()
+
+    def local_config(self):
+        if os.path.isdir(LOCAL_CMDS_DIR):
+            if os.path.isfile(LOCAL_CONFIG):
+                with open(LOCAL_CONFIG, 'r') as file_:
+                    self.config.update(json.load(file_))
+
+    def local_cmds(self):
+        if os.path.isdir(LOCAL_CMDS_DIR):
+            if 'local_cmds' in self.config:
+                for module, path in self.config['local_cmds'].iteritems():
+                    try:
+                        temp = imp.load_source(
+                                module,
+                                os.path.join(LOCAL_CMDS_DIR, path)
+                                )
+                        cmd_class = getattr(temp, module.capitalize(), None)
+                        if cmd_class is None:
+                            print module, "could not be loaded from .otto/"
+                        else:
+                            self.cmds[module] = cmd_class
+                    except Exception as e:
+                        raise e
+
+    def handle(self, cmd, args):
+        if cmd in self.cmds:
+            self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        print USAGE
+        sys.exit()
+
+    cmd = sys.argv[1]
+    args = sys.argv[2:]
+    otto = OttoDispatcher()
+    otto.handle(cmd, args)
