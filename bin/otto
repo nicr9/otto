@@ -4,9 +4,11 @@ import os.path
 import imp
 import json
 import sys
-from otto.cmds import DEFAULT_CMDS
-import pprint as pp
+import argparse
 
+from otto.cmds import DEFAULT_CMDS
+
+OTTO_DESC = "A workflow automator written in Python."
 USAGE = """Usage:
   $ otto COMMAND [ARG1 ARG2 ... ARGN]"""
 
@@ -46,16 +48,32 @@ class OttoDispatcher(object):
                     except Exception as e:
                         raise e
 
+    def list_cmds(self):
+        for key in self.cmds:
+            print "*", key
+
     def handle(self, cmd, args):
         if cmd in self.cmds:
             self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
 
-if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        print USAGE
-        sys.exit()
-
-    cmd = sys.argv[1]
-    args = sys.argv[2:]
+def bootstrap(cmd, args, opts):
     otto = OttoDispatcher()
-    otto.handle(cmd, args)
+    if opts['list_cmds']:
+        otto.list_cmds()
+    else:
+        otto.handle(cmd, args)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=OTTO_DESC)
+
+    parser.add_argument('-l', action='store_true', help="List available commands", dest='list_cmds')
+    parser.add_argument(action='store', nargs='?', default='', type=str, help="Workflow to run", metavar='command', dest='cmd')
+    parser.add_argument(action='store', nargs='*', type=str, help="Arguments for command", metavar='ARG', dest='args')
+
+    namespace = parser.parse_args()
+
+    cmd = namespace.cmd
+    args = namespace.args
+    opts = {'list_cmds': namespace.list_cmds}
+
+    bootstrap(cmd, args, opts)
