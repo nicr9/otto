@@ -35,4 +35,24 @@ class %s(otto.OttoCmd):
                                 )
                         )
 
+class Remember(OttoCmd):
+    def run(self, *args):
+        if not args:
+            self.cmd_usage(['command_name', '[arg_to_remember1 ...]'])
+        else:
+            cmd_name = args[0]
+            cmd_args = args[1:]
+
+            config = open_config()
+
+            # Split up args
+            args_split = [z.split(':') for z in cmd_args if z.count(':') == 1]
+
+            # Turn into dict
+            args_d = dict(args_split)
+
+            config[cmd_name] = args_d
+
+            save_config(config)
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
