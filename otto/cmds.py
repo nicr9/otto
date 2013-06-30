@@ -12,11 +12,11 @@ class %s(otto.OttoCmd):
 """
 
     def run(self, *args):
-        cmd_name = args[0]
-        cmd_args = args[1:]
-        if cmd_name is None:
+        if not args:
             self.cmd_usage(['new_command_name', '[cmd_arg_1 ...]'])
         else:
+            cmd_name = args[0]
+            cmd_args = args[1:]
             path = cmd_name + '.py'
 
             # Ensure .otto/ exists
