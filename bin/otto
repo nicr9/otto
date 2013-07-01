@@ -52,6 +52,13 @@ class OttoDispatcher(object):
         for key in self.cmds:
             print "*", key
 
+    def print_docs(self, cmd):
+        docs = self.cmds[cmd].__doc__
+        if docs is None:
+            print "Whoops, this command doesn't seem to have a docstring."
+        else:
+            print docs
+
     def handle(self, cmd, args):
         if cmd in self.cmds:
             self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
@@ -60,6 +67,8 @@ def bootstrap(cmd, args, opts):
     otto = OttoDispatcher()
     if opts['list_cmds']:
         otto.list_cmds()
+    elif opts['cmd_docs']:
+        otto.print_docs(cmd)
     else:
         otto.handle(cmd, args)
 
@@ -67,6 +76,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=OTTO_DESC)
 
     parser.add_argument('-l', action='store_true', help="List available commands", dest='list_cmds')
+    parser.add_argument('-d', action='store_true', help="print out the docstring for the specified command", dest='cmd_docs')
     parser.add_argument(action='store', nargs='?', default='', type=str, help="Workflow to run", metavar='command', dest='cmd')
     parser.add_argument(action='store', nargs='*', type=str, help="Arguments for command", metavar='ARG', dest='args')
 
@@ -74,6 +84,9 @@ if __name__ == "__main__":
 
     cmd = namespace.cmd
     args = namespace.args
-    opts = {'list_cmds': namespace.list_cmds}
+    opts = {
+            'list_cmds': namespace.list_cmds,
+            'cmd_docs': namespace.cmd_docs,
+            }
 
     bootstrap(cmd, args, opts)

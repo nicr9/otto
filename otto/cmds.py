@@ -3,6 +3,13 @@ import os
 import os.path
 
 class New(OttoCmd):
+    """Used to create boilerplate for new local commands.
+
+For example, if you want to create a new command "do_something" with the argument "with" you would run the following:
+  $ otto new do_something with
+
+This will create a hidden directory with the boilerplate code ready for you to extend and a config file enabling the new command."""
+
     cmd_template = """import otto.utils as otto
 
 class %s(otto.OttoCmd):
@@ -36,6 +43,14 @@ class %s(otto.OttoCmd):
                         )
 
 class Remember(OttoCmd):
+    """Binds named arguments to a command.
+
+For example, if you wanted to bind the value "this" to the do_something command's argument named "with":
+  $ otto remember do_something with:this
+
+To bind more complicated values, you can wrap the binding in quotes like this:
+  $ otto remember do_something "with:something else altogether" """
+
     def run(self, *args):
         if not args:
             self.cmd_usage(['command_name', '[arg_to_remember1 ...]'])
