@@ -3,6 +3,7 @@ import os
 import os.path
 import sys
 import json
+import subprocess
 
 OTTO_DIR = '.otto'
 OTTO_CONFIG = os.path.join(OTTO_DIR, 'config.json')
@@ -49,3 +50,13 @@ def _ensure_otto_dir():
     # Ensure .otto/ exists
     if not os.path.isdir(OTTO_DIR):
         os.mkdir(OTTO_DIR)
+
+def shell(cmd):
+    outp = ''
+    try:
+        print "\033[1m ==> %s \033[0m" % cmd
+        outp = subprocess.check_output(cmd, shell=True)
+    except CalledProcessError as e:
+        pass
+    finally:
+        return outp
