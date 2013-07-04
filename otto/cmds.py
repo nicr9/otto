@@ -70,4 +70,13 @@ To bind more complicated values, you can wrap the binding in quotes like this:
 
             save_config(config)
 
+class Cleanext(OttoCmd):
+    """This will erase all files with a particular extension from this directory and all sub directories.
+
+For example, to clean up all .pyc files run the following:
+  $ otto ext_cleanup pyc"""
+
+    def run(self, ext):
+        shell(r'find ./ -type f -name "*.%s" -exec rm -f {} \;' % ext)
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
