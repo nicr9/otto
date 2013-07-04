@@ -51,6 +51,12 @@ def _ensure_otto_dir():
     if not os.path.isdir(OTTO_DIR):
         os.mkdir(OTTO_DIR)
 
+def bold(msg):
+    print "\033[1m%s\033[0m" % msg
+
+def info(msg):
+    print "\033[94m%s\033[0m" % msg
+
 def shell(cmd):
     outp = ''
     try:
