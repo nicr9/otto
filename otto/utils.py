@@ -8,6 +8,8 @@ import subprocess
 OTTO_DIR = '.otto'
 OTTO_CONFIG = os.path.join(OTTO_DIR, 'config.json')
 
+USER_EXIT = "\n\nExiting..."
+
 class OttoCmd(object):
     """Base class for all `otto` commands"""
     __metaclass__ = abc.ABCMeta
@@ -60,9 +62,35 @@ def info(msg):
 def shell(cmd):
     outp = ''
     try:
-        print "\033[1m ==> %s \033[0m" % cmd
+        print "\033[1m $ %s \033[0m" % cmd
         outp = subprocess.check_output(cmd, shell=True)
     except CalledProcessError as e:
         pass
     finally:
         return outp
+
+def choose_dialog(values, header=None):
+    if header is not None:
+        bold(header)
+
+    for indx, val in enumerate(values):
+        print " %d) %s" % (indx, val)
+
+    result = -1
+    while True:
+        try:
+            ans = raw_input(">>> ")
+        except KeyboardInterrupt:
+            print USER_EXIT
+            return
+
+        if ans.isdigit():
+            ans = int(ans)
+        else:
+            continue
+
+
+        if 0 <= ans < len(values):
+            return ans
+        else:
+            continue
