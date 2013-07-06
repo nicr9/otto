@@ -6,6 +6,7 @@ import json
 import sys
 import argparse
 
+from subprocess import call as shcall
 from otto.cmds import DEFAULT_CMDS
 
 OTTO_DESC = "A workflow automator written in Python."
@@ -18,6 +19,7 @@ GLOBAL_CMDS_DIR = os.path.expanduser('~/.otto')
 GLOBAL_CONFIG = os.path.join(GLOBAL_CMDS_DIR, 'config.json')
 LOCAL_CMDS_DIR = os.path.join(os.getcwd(), '.otto')
 LOCAL_CONFIG = os.path.join(LOCAL_CMDS_DIR, 'config.json')
+RES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'otto_res')
 
 class OttoDispatcher(object):
     def __init__(self):
@@ -32,8 +34,8 @@ class OttoDispatcher(object):
     def update_config(self, path):
         head, tail = os.path.split(path)
         if os.path.isdir(head):
-            if os.path.isfile(tail):
-                with open(tail, 'r') as file_:
+            if os.path.isfile(path):
+                with open(path, 'r') as file_:
                     self.config.update(json.load(file_))
 
     def local_cmds(self):
@@ -67,6 +69,14 @@ class OttoDispatcher(object):
     def handle(self, cmd, args):
         if cmd in self.cmds:
             self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
+
+        self.tone()
+
+    def tone(self):
+        if 'tone' in self.config:
+            path = os.path.join(RES_DIR, self.config['tone'])
+            if os.path.isfile(path):
+                shcall(['aplay', path])
 
 def bootstrap(cmd, args, opts):
     otto = OttoDispatcher()
