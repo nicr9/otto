@@ -15,17 +15,22 @@ USAGE = """Usage:
   $ otto COMMAND [ARG1 ARG2 ... ARGN]"""
 
 DEBUG = True
-DEFAULT_CONFIG = {}
 
+# Paths
 RES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'otto_res')
+DEFAULT_CONFIG = os.path.join(RES_DIR, 'config.json')
 
 class OttoDispatcher(object):
     def __init__(self):
-        self.config = DEFAULT_CONFIG
+        # Default config/conmands
+        self.config = {}
+        self.update_config(DEFAULT_CONFIG)
         self.cmds = DEFAULT_CMDS
 
+        # Check ~/.otto for changes to config
         self.update_config(GLOBAL_CONFIG)
 
+        # Check ./.otto for changes to config/available commands
         self.update_config(LOCAL_CONFIG)
         self.local_cmds()
 
