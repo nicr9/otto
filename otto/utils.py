@@ -30,7 +30,7 @@ class OttoCmd(object):
 
 def open_config():
     """Opens config file, creates .otto/ folder if needed"""
-    _ensure_otto_dir()
+    ensure_dir(OTTO_DIR)
 
     # Try opening current config
     config = {}
@@ -42,16 +42,16 @@ def open_config():
 
 def save_config(config):
     """Save config to ./.otto/config.json"""
-    _ensure_otto_dir()
+    ensure_dir(OTTO_DIR)
 
     # Save
     with open(OTTO_CONFIG, 'w') as j:
         json.dump(config, j, indent=4)
 
-def _ensure_otto_dir():
-    # Ensure .otto/ exists
-    if not os.path.isdir(OTTO_DIR):
-        os.mkdir(OTTO_DIR)
+def ensure_dir(path):
+    """Looks for directory, creates it if it doesn't exist"""
+    if not os.path.isdir(path):
+        os.mkdir(path)
 
 def bold(msg):
     print "\033[1m%s\033[0m" % msg
