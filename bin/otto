@@ -7,6 +7,7 @@ import sys
 import argparse
 
 from subprocess import call as shcall
+from otto import *
 from otto.cmds import DEFAULT_CMDS
 
 OTTO_DESC = "A workflow automator written in Python."
@@ -15,10 +16,7 @@ USAGE = """Usage:
 
 DEBUG = True
 DEFAULT_CONFIG = {}
-GLOBAL_CMDS_DIR = os.path.expanduser('~/.otto')
-GLOBAL_CONFIG = os.path.join(GLOBAL_CMDS_DIR, 'config.json')
-LOCAL_CMDS_DIR = os.path.join(os.getcwd(), '.otto')
-LOCAL_CONFIG = os.path.join(LOCAL_CMDS_DIR, 'config.json')
+
 RES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'otto_res')
 
 class OttoDispatcher(object):
