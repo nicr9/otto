@@ -79,4 +79,31 @@ For example, to clean up all .pyc files run the following:
     def run(self, ext):
         shell(r'find ./ -type f -name "*.%s" -exec rm -f {} \;' % ext)
 
+class Pack(OttoCmd):
+    """Turn .otto into a package to be distributed/installed"""
+
+    def run(self, pack_name):
+        from shutil import copytree, rmtree
+
+        info("Packing up local commands...")
+
+        temp_path = 'temp_files'
+        pack_path = os.path.basename(pack_name + '.opack')
+        pack_config = os.path.join(temp_path, 'config.json')
+
+        copytree(OTTO_DIR, temp_path)
+
+        # Edit config
+        config = open_config(pack_config)
+        config['pack_cmds'] = config['local_cmds']
+        del config['local_cmds']
+
+        save_config(config, pack_config)
+
+        # Tar pack
+        shell(r'tar -czvf %s %s' % (pack_path, temp_path))
+
+        # Cleanup
+        rmtree(temp_path)
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
