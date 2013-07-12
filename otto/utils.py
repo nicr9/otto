@@ -28,24 +28,37 @@ class OttoCmd(object):
         print "Usage:\n  $ otto %s %s" % (self._name(), ' '.join(args))
         sys.exit()
 
-def open_config():
+def _config_dir_and_path(config_path):
+    if config_path is None:
+        config_dir = OTTO_DIR
+        config_path = OTTO_CONFIG
+    else:
+        config_dir, _ = os.path.split(config_path)
+
+    return config_dir, config_path
+
+def open_config(config_path=None):
     """Opens config file, creates .otto/ folder if needed"""
-    ensure_dir(OTTO_DIR)
+    config_dir, config_path = _config_dir_and_path(config_path)
+
+    ensure_dir(config_dir)
 
     # Try opening current config
     config = {}
-    if os.path.isfile(OTTO_CONFIG):
-        with open(OTTO_CONFIG, 'r') as j:
+    if os.path.isfile(config_path):
+        with open(config_path, 'r') as j:
             config = json.load(j)
 
     return config
 
-def save_config(config):
+def save_config(config, config_path=None):
     """Save config to ./.otto/config.json"""
-    ensure_dir(OTTO_DIR)
+    config_dir, config_path = _config_dir_and_path(config_path)
+
+    ensure_dir(config_dir)
 
     # Save
-    with open(OTTO_CONFIG, 'w') as j:
+    with open(config_path, 'w') as j:
         json.dump(config, j, indent=4)
 
 def ensure_dir(path):
