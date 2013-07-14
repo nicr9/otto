@@ -135,4 +135,15 @@ class Uninstall(OttoCmd):
         save_config(config, GLOBAL_CONFIG)
         rmtree(os.path.join(GLOBAL_CMDS_DIR, pack_name))
 
+class gitcheck(OttoCmd):
+    """Make sure no '# TODO:'s were left behind before commiting"""
+    def run(self):
+        import re
+        outp = shell(r'git diff --cached').splitlines()
+        info('The following lines with todos were found:')
+        for line in outp:
+            if re.search('#\s*TODO', line):
+                if re.search('^[+-]', line):
+                    print line
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
