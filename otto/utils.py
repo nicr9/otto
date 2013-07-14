@@ -95,7 +95,7 @@ def choose_dialog(values, header=None):
             ans = raw_input(">>> ")
         except KeyboardInterrupt:
             print USER_EXIT
-            return
+            sys.exit()
 
         if ans.isdigit():
             ans = int(ans)

@@ -117,4 +117,22 @@ class Install(OttoCmd):
         # Untar pack
         shell(r'tar -xzf %s -C %s' % (pack_path, GLOBAL_CMDS_DIR))
 
+class Uninstall(OttoCmd):
+    """Interactive prompt to remove installed package"""
+    def run(self):
+        from shutil import rmtree
+        # Get list of installed packages
+        config = open_config(GLOBAL_CONFIG)
+        installed_packs = config['packs']
+
+        # Ask user which to uninstall
+        indx = choose_dialog(installed_packs, "Which pack do you want to uninstall?")
+        pack_name = installed_packs[indx]
+        info('Uninstalling %s...' % pack_name)
+
+        # Remove pack
+        config['packs'].pop(indx)
+        save_config(config, GLOBAL_CONFIG)
+        rmtree(os.path.join(GLOBAL_CMDS_DIR, pack_name))
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
