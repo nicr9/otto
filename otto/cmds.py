@@ -1,3 +1,4 @@
+from otto import *
 from otto.utils import *
 import os
 import os.path
@@ -27,10 +28,10 @@ class %s(otto.OttoCmd):
 
             config = open_config()
 
-            # Add local_cmds section to config
-            if 'local_cmds' not in config:
-                config['local_cmds'] = {}
-            config['local_cmds'][cmd_name] = path
+            # Add cmds section to config
+            if 'cmds' not in config:
+                config['cmds'] = {}
+            config['cmds'][cmd_name] = path
 
             save_config(config)
 
@@ -84,26 +85,36 @@ class Pack(OttoCmd):
 
     def run(self, pack_name):
         from shutil import copytree, rmtree
-
+        pack_path = os.path.basename(pack_name + '.opack')
         info("Packing up local commands...")
 
-        temp_path = 'temp_files'
-        pack_path = os.path.basename(pack_name + '.opack')
-        pack_config = os.path.join(temp_path, 'config.json')
+        # Copy .otto/
+        copytree(OTTO_DIR, pack_name)
 
-        copytree(OTTO_DIR, temp_path)
-
-        # Edit config
-        config = open_config(pack_config)
-        config['pack_cmds'] = config['local_cmds']
-        del config['local_cmds']
-
-        save_config(config, pack_config)
-
-        # Tar pack
-        shell(r'tar -czvf %s %s' % (pack_path, temp_path))
+        # Tar to .opack file
+        shell(r'tar -czf %s %s' % (pack_path, pack_name))
 
         # Cleanup
-        rmtree(temp_path)
+        rmtree(pack_name)
+
+class Install(OttoCmd):
+    """Install a package as global commands"""
+
+    def run(self, pack_path):
+        pack_name = os.path.basename(pack_path).split('.opack')[0]
+
+        # Open global config
+        config = open_config(GLOBAL_CONFIG)
+
+        # Add pack
+        if 'packs' not in config:
+            config['packs'] = []
+        config['packs'].append(pack_name)
+
+        # Save global config
+        save_config(config, GLOBAL_CONFIG)
+
+        # Untar pack
+        shell(r'tar -xzf %s -C %s' % (pack_path, GLOBAL_CMDS_DIR))
 
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
