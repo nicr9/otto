@@ -146,4 +146,15 @@ class gitcheck(OttoCmd):
                 if re.search('^[+-]', line):
                     print line
 
+class wait(OttoCmd):
+    """Pause for X number of seconds"""
+    def run(self, secs):
+        from time import sleep
+        if secs.isdigit():
+            max_secs = int(secs)
+            with SingleLine() as disp:
+                for t in range(int(secs), 0, -1):
+                    disp(t)
+                    sleep(1)
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
