@@ -108,6 +108,23 @@ def choose_dialog(values, header=None):
         else:
             continue
 
+def input_dialog(header="", default=None):
+    if default is None:
+        prompt = "%s : " % header
+    else:
+        prompt = "%s [%s] : " % (header, default)
+
+    bold_prompt = bold(prompt)
+
+    while True:
+        temp = raw_input(bold_prompt)
+        if temp != "":
+            return temp
+        elif temp == "" and default is not None:
+            return default
+        else:
+            continue
+
 class SingleLine(object):
     def __init__(self):
         from sys import stdout
