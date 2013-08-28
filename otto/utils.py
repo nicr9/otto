@@ -107,3 +107,25 @@ def choose_dialog(values, header=None):
             return ans
         else:
             continue
+
+class SingleLine(object):
+    def __init__(self):
+        from sys import stdout
+        self.stdout = stdout
+        self.last_val = 0
+
+    def __enter__(self):
+        def f(val):
+            val_len = len(str(val))
+            len_diff = self.last_val - val_len
+            if len_diff > 0:
+                self.stdout.write("\r%s%s" % (val, ' ' * len_diff))
+            else:
+                self.stdout.write("\r%s" % val)
+            self.stdout.flush()
+            self.last_val = val_len
+
+        return f
+
+    def __exit__(self, a, b, c):
+        self.stdout.write("\n")
