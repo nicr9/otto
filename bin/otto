@@ -5,8 +5,8 @@ import imp
 import json
 import sys
 import argparse
-
 from subprocess import call as shcall
+
 from otto import *
 from otto.cmds import DEFAULT_CMDS
 
@@ -93,7 +93,10 @@ class OttoDispatcher(object):
         if 'tone' in self.config:
             path = os.path.join(RES_DIR, self.config['tone'])
             if os.path.isfile(path):
-                shcall(['aplay', '-q', path])
+                try:
+                    shcall(['aplay', '-q', path])
+                except Exception as e:
+                    print "Couldn't play tone (%s)" % e
             else:
                 print "tone not found: %s" % path
 
