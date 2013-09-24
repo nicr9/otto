@@ -125,6 +125,16 @@ def input_dialog(header="", default=None):
         else:
             continue
 
+class ChangePath(object):
+    def __init__(self):
+        self._base_dir = os.getcwd()
+
+    def __enter__(self, path):
+        os.chdir(path)
+
+    def __exit__(self, a, b, c):
+        os.chdir(self._base_dir)
+
 class SingleLine(object):
     def __init__(self):
         from sys import stdout
