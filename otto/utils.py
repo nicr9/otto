@@ -126,11 +126,12 @@ def input_dialog(header="", default=None):
             continue
 
 class ChangePath(object):
-    def __init__(self):
+    def __init__(self, path):
         self._base_dir = os.getcwd()
+        self._dest_dir = path
 
-    def __enter__(self, path):
-        os.chdir(path)
+    def __enter__(self):
+        os.chdir(self._dest_dir)
 
     def __exit__(self, a, b, c):
         os.chdir(self._base_dir)
