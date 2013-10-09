@@ -115,7 +115,7 @@ def choose_dialog(values, header=None):
             continue
 
 def input_dialog(header="", default=None):
-    if default is None:
+    if default is None or default is "":
         prompt = "%s : " % header
     else:
         prompt = "%s [%s] : " % (header, default)
