@@ -66,11 +66,17 @@ def ensure_dir(path):
     if not os.path.isdir(path):
         os.mkdir(path)
 
+def bold_format(msg):
+    return "\033[1m%s\033[0m" % msg
+
+def info_format(msg):
+    return "\033[94m%s\033[0m" % msg
+
 def bold(msg):
-    print "\033[1m%s\033[0m" % msg
+    print bold_format(msg)
 
 def info(msg):
-    print "\033[94m%s\033[0m" % msg
+    print info_format(msg)
 
 def shell(cmd):
     outp = ''
@@ -114,7 +120,7 @@ def input_dialog(header="", default=None):
     else:
         prompt = "%s [%s] : " % (header, default)
 
-    bold_prompt = bold(prompt)
+    bold_prompt = bold_format(prompt)
 
     while True:
         temp = raw_input(bold_prompt)
