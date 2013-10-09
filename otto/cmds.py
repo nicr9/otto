@@ -123,17 +123,21 @@ class Uninstall(OttoCmd):
         from shutil import rmtree
         # Get list of installed packages
         config = open_config(GLOBAL_CONFIG)
-        installed_packs = config['packs']
+        if 'packs' in config:
+            installed_packs = config['packs']
+        else:
+            info("No packs installed")
+            bail()
 
         # Ask user which to uninstall
-        indx = choose_dialog(installed_packs, "Which pack do you want to uninstall?")
-        pack_name = installed_packs[indx]
-        info('Uninstalling %s...' % pack_name)
+        dialog = Dialog("Which pack do you want to uninstall?")
+        dialog.choose(installed_packs)
+        info('Uninstalling %s...' % dialog.result)
 
         # Remove pack
-        config['packs'].pop(indx)
+        config['packs'].pop(dialog.index)
         save_config(config, GLOBAL_CONFIG)
-        rmtree(os.path.join(GLOBAL_CMDS_DIR, pack_name))
+        rmtree(os.path.join(GLOBAL_CMDS_DIR, dialog.result))
 
 class gitcheck(OttoCmd):
     """Make sure no '# TODO:'s were left behind before commiting"""

@@ -8,7 +8,9 @@ import subprocess
 OTTO_DIR = '.otto'
 OTTO_CONFIG = os.path.join(OTTO_DIR, 'config.json')
 
-USER_EXIT = "\n\nExiting..."
+def bail():
+    print "\n\nExiting..."
+    sys.exit()
 
 class OttoCmd(object):
     """Base class for all `otto` commands"""
@@ -88,48 +90,78 @@ def shell(cmd):
     finally:
         return outp
 
-def choose_dialog(values, header=None):
-    if header is not None:
-        bold(header)
+class Dialog(object):
+    def __init__(self, header):
+        self.header = header
+        self.result = None
 
-    for indx, val in enumerate(values):
-        print " %d) %s" % (indx, val)
+    def _validate(self):
+        if self.result is not None:
+            raise Exception("This dialog has already been used")
 
-    result = -1
-    while True:
-        try:
-            ans = raw_input(">>> ")
-        except KeyboardInterrupt:
-            print USER_EXIT
-            sys.exit()
+    def choose(self, values):
+        self._validate()
 
-        if ans.isdigit():
-            ans = int(ans)
+        if self.header is not None:
+            bold("%s : " % self.header)
+
+        for indx, val in enumerate(values):
+            print " %d) %s" % (indx, val)
+
+        while True:
+            try:
+                ans = raw_input(">>> ")
+            except KeyboardInterrupt:
+                bail()
+
+            if ans.isdigit():
+                ans = int(ans)
+            else:
+                continue
+
+            if 0 <= ans < len(values):
+                self.result = values[ans]
+                self.index = ans
+                break
+            else:
+                continue
+
+    def input(self, default=None):
+        self._validate()
+
+        if default is None or default is "":
+            prompt = "%s : " % self.header
         else:
-            continue
+            prompt = "%s [%s] : " % (self.header, default)
 
+        bold_prompt = bold_format(prompt)
 
-        if 0 <= ans < len(values):
-            return ans
+        while True:
+            try:
+                temp = raw_input(bold_prompt)
+            except KeyboardInterrupt:
+                bail()
+            if temp != "":
+                self.result = temp
+                break
+            elif temp == "" and default is not None:
+                self.result = default
+                break
+            else:
+                continue
+
+    def yesno(self, yes='y', no='n'):
+        self._validate()
+
+        prompt = bold_format("%s (%s/%s) : " % (self.header, yes, no))
+        temp = raw_input(prompt)
+
+        if temp == yes:
+            self.result = True
+        elif temp == no:
+            self.result = False
         else:
-            continue
-
-def input_dialog(header="", default=None):
-    if default is None or default is "":
-        prompt = "%s : " % header
-    else:
-        prompt = "%s [%s] : " % (header, default)
-
-    bold_prompt = bold_format(prompt)
-
-    while True:
-        temp = raw_input(bold_prompt)
-        if temp != "":
-            return temp
-        elif temp == "" and default is not None:
-            return default
-        else:
-            continue
+            bail()
 
 class ChangePath(object):
     def __init__(self, path):
