@@ -154,7 +154,11 @@ class Dialog(object):
         self._validate()
 
         prompt = bold_format("%s (%s/%s) : " % (self.header, yes, no))
-        temp = raw_input(prompt)
+
+        try:
+            temp = raw_input(prompt)
+        except KeyboardInterrupt:
+            bail()
 
         if temp == yes:
             self.result = True
