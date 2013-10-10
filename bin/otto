@@ -6,6 +6,7 @@ import json
 import sys
 import argparse
 from subprocess import call as shcall
+import shutil
 
 from otto import *
 from otto.cmds import DEFAULT_CMDS
@@ -28,19 +29,36 @@ class OttoDispatcher(object):
         self.cmds = DEFAULT_CMDS
 
         # Check ~/.otto for changes to config
-        self.update_config(GLOBAL_CONFIG)
+        self.update_config(GLOBAL_CONFIG, True)
         self.update_packs()
 
         # Check ./.otto for changes to config/available commands
         self.update_config(LOCAL_CONFIG)
         self.update_cmds()
 
-    def update_config(self, path):
+    def update_config(self, path, create=False):
         head, tail = os.path.split(path)
-        if os.path.isdir(head):
-            if os.path.isfile(path):
-                with open(path, 'r') as file_:
-                    self.config.update(json.load(file_))
+        head_exists = os.path.isdir(head)
+        tail_exists = os.path.isfile(path)
+
+        # Check if path needs to be created
+        create_something = not head_exists or not tail_exists
+        if create and path != DEFAULT_CONFIG:
+            if not head_exists:
+                shutil.mkdir(head)
+            if not tail_exists:
+                print "Regenerating %s from %s" % (path, DEFAULT_CONFIG)
+                shutil.copyfile(DEFAULT_CONFIG, path)
+                tail_exists = True
+        elif create and path == DEFAULT_CONFIG and create_something:
+            raise Exception("Can't create %s, please reinstall" % path)
+
+        # Open file and use to update 'config'
+        if tail_exists:
+            with open(path, 'r') as file_:
+                self.config.update(json.load(file_))
+        else:
+            raise Exception("Can't access config at %s" % path)
 
     def update_cmds(self, cmds_dir=None):
         if cmds_dir is None:
