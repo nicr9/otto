@@ -4,6 +4,7 @@ import os.path
 import sys
 import json
 import subprocess
+from getpass import getpass
 
 OTTO_DIR = '.otto'
 OTTO_CONFIG = os.path.join(OTTO_DIR, 'config.json')
@@ -165,6 +166,14 @@ class Dialog(object):
         elif temp == no:
             self.result = False
         else:
+            bail()
+
+    def secret(self):
+        self._validate()
+
+        try:
+            self.result = getpass("%s : " % self.header)
+        except KeyboardInterrupt:
             bail()
 
 class ChangePath(object):
