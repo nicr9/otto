@@ -45,7 +45,7 @@ class OttoDispatcher(object):
         create_something = not head_exists or not tail_exists
         if create and path != DEFAULT_CONFIG:
             if not head_exists:
-                shutil.mkdir(head)
+                os.mkdir(head)
             if not tail_exists:
                 print "Regenerating %s from %s" % (path, DEFAULT_CONFIG)
                 shutil.copyfile(DEFAULT_CONFIG, path)
