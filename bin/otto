@@ -33,7 +33,7 @@ class OttoDispatcher(object):
         self.update_packs()
 
         # Check ./.otto for changes to config/available commands
-        self.update_config(LOCAL_CONFIG)
+        self.update_config(LOCAL_CONFIG, True)
         self.update_cmds()
 
     def update_config(self, path, create=False):

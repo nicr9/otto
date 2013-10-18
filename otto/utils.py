@@ -142,6 +142,7 @@ class Dialog(object):
                 temp = raw_input(bold_prompt)
             except KeyboardInterrupt:
                 bail()
+
             if temp != "":
                 self.result = temp
                 break
