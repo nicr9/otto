@@ -81,10 +81,11 @@ def bold(msg):
 def info(msg):
     print info_format(msg)
 
-def shell(cmd):
+def shell(cmd, echo=True):
     outp = ''
     try:
-        print "\033[1m $ %s \033[0m" % cmd
+        if echo:
+            bold(" $ %s" % cmd)
         outp = subprocess.check_output(cmd, shell=True)
     except CalledProcessError as e:
         pass
