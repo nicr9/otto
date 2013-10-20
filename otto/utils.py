@@ -131,7 +131,7 @@ class Dialog(object):
             else:
                 continue
 
-    def input(self, default=None):
+    def input(self, default=None, parse=None):
         self._validate()
 
         if default is None or default is "":
@@ -147,14 +147,18 @@ class Dialog(object):
             except KeyboardInterrupt:
                 bail()
 
-            if temp != "":
-                self.result = temp
-                break
-            elif temp == "" and default is not None:
-                self.result = default
-                break
-            else:
+            if temp == "" and default is None:
+                print "Try again"
                 continue
+            else:
+                temp = temp if temp != "" else default
+                try:
+                    self.result = temp if not parse else parse(temp)
+                except:
+                    raise Exception(
+                            "Failed to parse input %s using %s" % (temp, str(parse))
+                            )
+                break
 
     def yesno(self, yes='y', no='n'):
         self._validate()
