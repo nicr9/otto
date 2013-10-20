@@ -101,14 +101,17 @@ class Dialog(object):
         if self.result is not None:
             raise Exception("This dialog has already been used")
 
-    def choose(self, values):
+    def choose(self, values, subvalue=None):
         self._validate()
 
         if self.header is not None:
             bold("%s : " % self.header)
 
         for indx, val in enumerate(values):
-            print " %d) %s" % (indx, val)
+            if subvalue:
+                print " %d) %s" % (indx, val[subvalue])
+            else:
+                print " %d) %s" % (indx, val)
 
         while True:
             try:
@@ -191,8 +194,7 @@ class ChangePath(object):
 
 class SingleLine(object):
     def __init__(self):
-        from sys import stdout
-        self.stdout = stdout
+        self.stdout = sys.stdout
         self.last_val = 0
 
     def __enter__(self):
