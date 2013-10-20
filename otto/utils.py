@@ -70,10 +70,10 @@ def ensure_dir(path):
         os.mkdir(path)
 
 def bold_format(msg):
-    return "\033[1m%s\033[0m" % msg
+    return "\033[1m%s\033[0m" % str(msg)
 
 def info_format(msg):
-    return "\033[94m%s\033[0m" % msg
+    return "\033[94m%s\033[0m" % str(msg)
 
 def bold(msg):
     print bold_format(msg)
