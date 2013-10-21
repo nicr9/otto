@@ -68,21 +68,28 @@ class OttoDispatcher(object):
         if os.path.isdir(cmds_dir):
             if 'cmds' in self.config:
                 for module, path in self.config['cmds'].iteritems():
-                    try:
-                        temp = imp.load_source(
-                                module,
-                                os.path.join(cmds_dir, path)
-                                )
-                        cmd_class = getattr(temp, module.capitalize(), None)
-                        if cmd_class is None:
-                            print module, "could not be loaded from %s" % load_from
-                        else:
-                            self.cmds[module] = cmd_class
-                    except SyntaxError as e:
-                        print "Whoops, syntax error found:\nFile:%s (%s, %s)" % e.args[1][:3]
-                        sys.exit()
-                    except Exception as e:
-                        raise e
+                    self._load_cmd(
+                            module,
+                            os.path.join(cmds_dir, path)
+                            )
+
+    def _load_cmd(self, module, path):
+        try:
+            temp = imp.load_source(
+                    module,
+                    path
+                    )
+            cmd_class = getattr(temp, module.capitalize(), None)
+            if cmd_class is None:
+                print module, "could not be loaded from %s" % load_from
+            else:
+                self.cmds[module] = cmd_class
+        except SyntaxError as e:
+            print "Whoops, syntax error found:"
+            print "File:%s (%s, %s)" % e.args[1][:3]
+            sys.exit()
+        except Exception as e:
+            raise e
 
     def update_packs(self):
         if 'packs' in self.config:
