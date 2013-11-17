@@ -92,12 +92,32 @@ class Pack(OttoCmd):
     def run(self, pack_name):
         from shutil import copytree, rmtree
         pack_path = os.path.basename(pack_name + '.opack')
-        info("Packing up local commands...")
+        pack_local = os.path.join(pack_name, 'local')
+        pack_pack = os.path.join(pack_name, pack_name)
 
-        # Copy .otto/
+        # Make copy of .otto/
+        info("Copying .otto...")
         copytree(LOCAL_DIR, pack_name)
 
+        info("Modifying copy...")
+        copytree(
+                pack_local,
+                pack_pack,
+                )
+        rmtree(pack_local)
+        shell(r'find %s -type f -name "*.pyc" -exec rm -f {} \;' % pack_name)
+
+        # Edit json files
+        with ConfigFile(os.path.join(pack_name, 'config.json')) as config:
+            config['packs'][pack_name] = pack_name
+            del config['packs']['local']
+
+        with ConfigFile(os.path.join(pack_pack, 'cmds.json')) as cmds:
+            for key in cmds:
+                cmds[key] = os.path.join(pack_name, "%s.py" % key)
+
         # Tar to .opack file
+        info("Packing up...")
         shell(r'tar -czf %s %s' % (pack_path, pack_name))
 
         # Cleanup
