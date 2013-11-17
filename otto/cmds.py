@@ -1,5 +1,7 @@
 from otto import *
 from otto.utils import *
+from otto.config import CmdsConfig
+from lament import ConfigFile
 import os
 import os.path
 
@@ -24,18 +26,27 @@ class %s(otto.OttoCmd):
         else:
             cmd_name = args[0]
             cmd_args = args[1:]
-            path = cmd_name + '.py'
 
-            config = open_config()
+            file_name = cmd_name + '.py'
+            cmd_path = os.path.join(LOCAL_CMDS_DIR, file_name)
+            cmds_file = os.path.join(LOCAL_CMDS_DIR, 'cmds.json')
+            config_file = os.path.join(OTTO_DIR, 'config.json')
 
-            # Add cmds section to config
-            if 'cmds' not in config:
-                config['cmds'] = {}
-            config['cmds'][cmd_name] = path
+            # Create dir structure
+            ensure_dir(LOCAL_CMDS_DIR)
 
-            save_config(config)
+            # Config
+            with ConfigFile(config_file, True) as config:
+                config['packs'] = {
+                        'local': LOCAL_CMDS_DIR,
+                        }
 
-            with open(os.path.join(OTTO_DIR, path), 'w') as cmd_file:
+            with ConfigFile(cmds_file, True) as local_cmds:
+                cmds = local_cmds.setdefault('cmds', {})
+                cmds[cmd_name] = cmd_path
+
+            # Create template for cmd
+            with open(cmd_path, 'w') as cmd_file:
                 cmd_file.write(
                         self.cmd_template % (
                                 cmd_name.capitalize(),

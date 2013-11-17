@@ -67,7 +67,7 @@ def save_config(config, config_path=None):
 def ensure_dir(path):
     """Looks for directory, creates it if it doesn't exist"""
     if not os.path.isdir(path):
-        os.mkdir(path)
+        os.makedirs(path)
 
 def bold_format(msg):
     return "\033[1m%s\033[0m" % str(msg)

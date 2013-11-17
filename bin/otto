@@ -10,6 +10,7 @@ import shutil
 
 from otto import *
 from otto.cmds import DEFAULT_CMDS
+from otto.config import OttoConfig
 
 OTTO_DESC = "A workflow automator written in Python."
 USAGE = """Usage:
@@ -24,100 +25,31 @@ DEFAULT_CONFIG = os.path.join(RES_DIR, 'config.json')
 class OttoDispatcher(object):
     def __init__(self):
         # Default config/conmands
-        self.config = {}
-        self.update_config(DEFAULT_CONFIG)
-        self.cmds = DEFAULT_CMDS
+        self.config = OttoConfig()
+        self.config.packs.init(DEFAULT_CMDS)
 
         # Check ~/.otto for changes to config
-        self.update_config(GLOBAL_CONFIG, True)
-        self.update_packs()
+        self.config.update_from_file(GLOBAL_CONFIG)
 
         # Check ./.otto for changes to config/available commands
-        self.update_config(LOCAL_CONFIG)
-        self.update_cmds()
-
-    def update_config(self, path, create=False):
-        head, tail = os.path.split(path)
-        head_exists = os.path.isdir(head)
-        tail_exists = os.path.isfile(path)
-
-        # Check if path needs to be created
-        create_something = not head_exists or not tail_exists
-        if create and path != DEFAULT_CONFIG:
-            if not head_exists:
-                os.mkdir(head)
-            if not tail_exists:
-                print "Regenerating %s from %s" % (path, DEFAULT_CONFIG)
-                shutil.copyfile(DEFAULT_CONFIG, path)
-                tail_exists = True
-        elif create and path == DEFAULT_CONFIG and create_something:
-            raise Exception("Can't create %s, please reinstall" % path)
-
-        # Open file and use to update 'config'
-        if tail_exists:
-            with open(path, 'r') as file_:
-                self.config.update(json.load(file_))
-
-    def update_cmds(self, cmds_dir=None):
-        if cmds_dir is None:
-            cmds_dir = LOCAL_CMDS_DIR
-            load_from = 'local commands: .otto/'
-        else:
-            load_from = 'package: %s' % cmds_dir
-
-        if os.path.isdir(cmds_dir):
-            if 'cmds' in self.config:
-                for module, path in self.config['cmds'].iteritems():
-                    self._load_cmd(
-                            module,
-                            os.path.join(cmds_dir, path)
-                            )
-
-    def _load_cmd(self, module, path):
-        try:
-            temp = imp.load_source(
-                    module,
-                    path
-                    )
-            cmd_class = getattr(temp, module.capitalize(), None)
-            if cmd_class is None:
-                print module, "could not be loaded from %s" % load_from
-            else:
-                self.cmds[module] = cmd_class
-        except SyntaxError as e:
-            print "Whoops, syntax error found:"
-            print "File:%s (%s, %s)" % e.args[1][:3]
-            sys.exit()
-        except Exception as e:
-            raise e
-
-    def update_packs(self):
-        if 'packs' in self.config:
-            for pack in self.config['packs']:
-                pack_path = os.path.join(GLOBAL_CMDS_DIR, pack)
-                self.update_config(os.path.join(pack_path, 'config.json'))
-                self.update_cmds(pack_path)
+        self.config.update_from_file(LOCAL_CONFIG)
 
     def list_cmds(self):
-        for key in self.cmds:
-            print "*", key
+        self.config.packs.list_cmds()
 
     def print_docs(self, cmd):
-        docs = self.cmds[cmd].__doc__
-        if docs is None:
-            print "Whoops, this command doesn't seem to have a docstring."
-        else:
-            print docs
+        self.config.packs.docs(cmd)
 
     def handle(self, cmd, args):
-        if cmd in self.cmds:
-            self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
+        self.config.packs.run(cmd, *args)
+        #if cmd in self.cmds:
+        #    self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
 
         self.tone()
 
     def tone(self):
-        if 'tone' in self.config:
-            path = os.path.join(RES_DIR, self.config['tone'])
+        if self.config.tone:
+            path = os.path.join(RES_DIR, self.config.tone)
             if os.path.isfile(path):
                 try:
                     shcall(['aplay', '-q', path])
