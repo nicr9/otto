@@ -69,18 +69,12 @@ To bind more complicated values, you can wrap the binding in quotes like this:
             cmd_name = args[0]
             cmd_args = args[1:]
 
-            # Split up args
-            args_split = [z.split(':') for z in cmd_args if z.count(':') == 1]
-
-            # Turn into dict
-            args_d = dict(args_split)
+            arg_d = {cmd_name: cmd_args}
 
             # Open local config
             with ConfigFile(LOCAL_CONFIG, True) as config:
                 config.update(
-                        remember={
-                            cmd_name: args_d,
-                            }
+                        remember=arg_d
                         )
 
 class Cleanext(OttoCmd):
