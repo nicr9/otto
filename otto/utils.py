@@ -4,10 +4,9 @@ import os.path
 import sys
 import json
 import subprocess
-from getpass import getpass
 
-OTTO_DIR = '.otto'
-OTTO_CONFIG = os.path.join(OTTO_DIR, 'config.json')
+from getpass import getpass
+from otto import *
 
 def bail():
     print "\n\nExiting..."
@@ -33,8 +32,8 @@ class OttoCmd(object):
 
 def _config_dir_and_path(config_path):
     if config_path is None:
-        config_dir = OTTO_DIR
-        config_path = OTTO_CONFIG
+        config_dir = LOCAL_DIR
+        config_path = LOCAL_CONFIG
     else:
         config_dir, _ = os.path.split(config_path)
 

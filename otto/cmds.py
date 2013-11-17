@@ -30,13 +30,12 @@ class %s(otto.OttoCmd):
             file_name = cmd_name + '.py'
             cmd_path = os.path.join(LOCAL_CMDS_DIR, file_name)
             cmds_file = os.path.join(LOCAL_CMDS_DIR, 'cmds.json')
-            config_file = os.path.join(OTTO_DIR, 'config.json')
 
             # Create dir structure
             ensure_dir(LOCAL_CMDS_DIR)
 
             # Config
-            with ConfigFile(config_file, True) as config:
+            with ConfigFile(LOCAL_CONFIG, True) as config:
                 config['packs'] = {
                         'local': LOCAL_CMDS_DIR,
                         }
@@ -100,7 +99,7 @@ class Pack(OttoCmd):
         info("Packing up local commands...")
 
         # Copy .otto/
-        copytree(OTTO_DIR, pack_name)
+        copytree(LOCAL_DIR, pack_name)
 
         # Tar to .opack file
         shell(r'tar -czf %s %s' % (pack_path, pack_name))
