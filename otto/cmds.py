@@ -69,17 +69,19 @@ To bind more complicated values, you can wrap the binding in quotes like this:
             cmd_name = args[0]
             cmd_args = args[1:]
 
-            config = open_config()
-
             # Split up args
             args_split = [z.split(':') for z in cmd_args if z.count(':') == 1]
 
             # Turn into dict
             args_d = dict(args_split)
 
-            config[cmd_name] = args_d
-
-            save_config(config)
+            # Open local config
+            with ConfigFile(LOCAL_CONFIG, True) as config:
+                config.update(
+                        remember={
+                            cmd_name: args_d,
+                            }
+                        )
 
 class Cleanext(OttoCmd):
     """This will erase all files with a particular extension from this directory and all sub directories.

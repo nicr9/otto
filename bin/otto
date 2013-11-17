@@ -41,9 +41,9 @@ class OttoDispatcher(object):
         self.config.packs.docs(cmd)
 
     def handle(self, cmd, args):
-        self.config.packs.run(cmd, *args)
-        #if cmd in self.cmds:
-        #    self.cmds[cmd]().run(*args, **self.config.get(cmd, {}))
+        key = self.config.packs.lookup(cmd)
+        kw = self.config.remember.get("%s:%s" % key, {})
+        self.config.packs.run(cmd, *args, **kw)
 
         self.tone()
 
