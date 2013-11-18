@@ -9,3 +9,6 @@ GLOBAL_CONFIG = os.path.join(GLOBAL_DIR, 'config.json')
 LOCAL_DIR = os.path.join(os.getcwd(), '.otto')
 LOCAL_CONFIG = os.path.join(LOCAL_DIR, 'config.json')
 LOCAL_CMDS_DIR = os.path.join(LOCAL_DIR, 'local')
+
+# Other constants
+PACK_EXT = '.opack'

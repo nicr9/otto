@@ -91,7 +91,7 @@ class Pack(OttoCmd):
 
     def run(self, pack_name):
         from shutil import copytree, rmtree
-        pack_path = os.path.basename(pack_name + '.opack')
+        pack_path = os.path.basename(pack_name + PACK_EXT)
         pack_local = os.path.join(pack_name, 'local')
         pack_pack = os.path.join(pack_name, pack_name)
 
@@ -116,7 +116,7 @@ class Pack(OttoCmd):
             for key in cmds['cmds']:
                 cmds['cmds'][key] = os.path.join(pack_name, "%s.py" % key)
 
-        # Tar to .opack file
+        # Tar up package
         info("Packing up...")
         shell(r'tar -czf %s %s' % (pack_path, pack_name))
 
@@ -128,7 +128,7 @@ class Install(OttoCmd):
 
     def run(self, pack_path):
         from shutil import copytree, rmtree
-        pack_name = os.path.basename(pack_path).split('.opack')[0]
+        pack_name = os.path.basename(pack_path).split(PACK_EXT)[0]
         install_temp = os.path.join(GLOBAL_DIR, '_installing') 
 
         ensure_dir(install_temp)
