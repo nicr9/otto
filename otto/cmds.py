@@ -145,9 +145,16 @@ class Install(OttoCmd):
         with ConfigFile(os.path.join(temp_dir, 'config.json')) as pack_config:
             to_install = pack_config['packs']
 
+        for key, val in to_install.iteritems():
+            to_install[key] = os.path.join(GLOBAL_DIR, val)
+
         with ConfigFile(GLOBAL_CONFIG, True) as installed_config:
             packs = installed_config.setdefault('packs', {})
             packs.update(to_install)
+
+        with ConfigFile(os.path.join(temp_dir, pack_name, 'cmds.json')) as cmds:
+            for key, val in cmds['cmds'].iteritems():
+                cmds['cmds'][key] = os.path.join(GLOBAL_DIR, val)
 
         # Copy pack cmds to GLOBAL_DIR
         copytree(
