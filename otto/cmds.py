@@ -113,8 +113,8 @@ class Pack(OttoCmd):
             del config['packs']['local']
 
         with ConfigFile(os.path.join(pack_pack, 'cmds.json')) as cmds:
-            for key in cmds:
-                cmds[key] = os.path.join(pack_name, "%s.py" % key)
+            for key in cmds['cmds']:
+                cmds['cmds'][key] = os.path.join(pack_name, "%s.py" % key)
 
         # Tar to .opack file
         info("Packing up...")
@@ -129,20 +129,24 @@ class Install(OttoCmd):
     def run(self, pack_path):
         from shutil import copytree, rmtree
         pack_name = os.path.basename(pack_path).split('.opack')[0]
-        temp_dir = os.path.join(GLOBAL_DIR, '_installing') 
+        install_temp = os.path.join(GLOBAL_DIR, '_installing') 
+
+        ensure_dir(install_temp)
 
         # Untar pack
         shell(r'tar -xzf %s -C %s' % (
             pack_path, 
-            temp_dir,
+            install_temp,
             ))
+
+        temp_dir = os.path.join(install_temp, pack_name)
 
         # Copy pack info to global config
         with ConfigFile(os.path.join(temp_dir, 'config.json')) as pack_config:
             to_install = pack_config['packs']
 
         with ConfigFile(GLOBAL_CONFIG, True) as installed_config:
-            packs = installed_config.get('packs', {})
+            packs = installed_config.setdefault('packs', {})
             packs.update(to_install)
 
         # Copy pack cmds to GLOBAL_DIR
@@ -152,7 +156,7 @@ class Install(OttoCmd):
                 )
 
         # Clean up
-        rmtree(temp_dir)
+        rmtree(install_temp)
 
 class Uninstall(OttoCmd):
     """Interactive prompt to remove installed package"""
