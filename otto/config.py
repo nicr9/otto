@@ -17,10 +17,6 @@ class CmdStore(object):
         self._ready = True
         self.packs = set(['base'])
         self.cmds['base'] = default_cmds
-        self.loadpack(
-                'local',
-                LOCAL_CMDS_DIR
-                )
 
     def loadpack(self, pack, cmds_dir):
         try:
