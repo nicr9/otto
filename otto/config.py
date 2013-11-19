@@ -1,6 +1,7 @@
 import os.path
 import imp
 from otto import LOCAL_CMDS_DIR
+from otto.utils import info, bail
 
 from lament import *
 
@@ -80,20 +81,33 @@ class CmdStore(object):
         self._run(pack, cmd, *args, **kwargs)
 
     def lookup(self, name):
+        pack, cmd = None, None
         if ':' in name:
             pack, cmd = name.split(':')[:2]
+            if pack not in self.cmds:
+                info("Couldn't find %s, are you sure it's installed?" % pack)
+                bail()
+
         else:
             if 'local' in self.cmds:
                 if name in self.cmds['local']:
                     pack = 'local'
+
             installed = self.packs - set(['base', 'local'])
             for key in installed:
                 if name in self.cmds[key]:
                     pack = key
+
             if name in self.cmds['base']:
                 pack = 'base'
-            return pack, name
-        return None, None
+
+            cmd = name
+
+        if pack and cmd:
+            return pack, cmd
+        else:
+            info("Couldn't find %s" % name)
+            bail()
 
     def docs(self, name):
         pack, cmd = self.lookup(name)
