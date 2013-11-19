@@ -174,6 +174,8 @@ class Uninstall(OttoCmd):
             if 'packs' in config:
                 installed_packs = config['packs']
             else:
+                installed_packs = {}
+            if not installed_packs:
                 info("No packs installed")
                 bail()
 
