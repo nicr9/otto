@@ -170,21 +170,22 @@ class Uninstall(OttoCmd):
     def run(self):
         from shutil import rmtree
         # Get list of installed packages
-        config = open_config(GLOBAL_CONFIG)
-        if 'packs' in config:
-            installed_packs = config['packs']
-        else:
-            info("No packs installed")
-            bail()
+        with ConfigFile(GLOBAL_CONFIG) as config:
+            if 'packs' in config:
+                installed_packs = config['packs']
+            else:
+                info("No packs installed")
+                bail()
 
-        # Ask user which to uninstall
-        dialog = Dialog("Which pack do you want to uninstall?")
-        dialog.choose(installed_packs)
-        info('Uninstalling %s...' % dialog.result)
+            # Ask user which to uninstall
+            dialog = Dialog("Which pack do you want to uninstall?")
+            dialog.choose(installed_packs.keys())
+            info('Uninstalling %s...' % dialog.result)
 
-        # Remove pack
-        config['packs'].pop(dialog.index)
-        save_config(config, GLOBAL_CONFIG)
+            # Remove pack from config
+            config['packs'].pop(dialog.result)
+
+        # Delete pack dir
         rmtree(os.path.join(GLOBAL_DIR, dialog.result))
 
 class gitcheck(OttoCmd):
