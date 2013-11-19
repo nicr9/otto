@@ -106,7 +106,8 @@ class Dialog(object):
         if self.header is not None:
             bold("%s : " % self.header)
 
-        for indx, val in enumerate(values):
+        indexed = values.keys() if isinstance(values, dict) else values
+        for indx, val in enumerate(indexed):
             if subvalue:
                 print " %d) %s" % (indx, val[subvalue])
             else:
@@ -124,7 +125,8 @@ class Dialog(object):
                 continue
 
             if 0 <= ans < len(values):
-                self.result = values[ans]
+                key = indexed[ans] if isinstance(values, dict) else ans
+                self.result = values[key]
                 self.index = ans
                 break
             else:
