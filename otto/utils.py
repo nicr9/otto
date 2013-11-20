@@ -91,6 +91,9 @@ def shell(cmd, echo=True):
     finally:
         return outp
 
+def edit_file(file_path):
+    subprocess.call(['vim', file_path])
+
 class Dialog(object):
     def __init__(self, header):
         self.header = header

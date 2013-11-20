@@ -53,6 +53,9 @@ class %s(otto.OttoCmd):
                                 )
                         )
 
+            # Allow user to implement new cmd
+            edit_file(cmd_path)
+
 class Remember(OttoCmd):
     """Binds named arguments to a command.
 
