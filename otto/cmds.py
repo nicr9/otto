@@ -56,6 +56,18 @@ class %s(otto.OttoCmd):
             # Allow user to implement new cmd
             edit_file(cmd_path)
 
+class Edit(OttoCmd):
+    def run(self, *args):
+        if len(args) != 1:
+            self.cmd_usage(['command_name'])
+        else:
+            pack, name = self._store.lookup(args[0])
+            if pack == 'base':
+                info("Sorry, you can't edit base commands like %s" % name)
+            else:
+                cmd_path = self._store.cmds[pack][name]
+                edit_file(cmd_path)
+
 class Remember(OttoCmd):
     """Binds named arguments to a command.
 
