@@ -78,7 +78,7 @@ class CmdStore(object):
 
     def _run(self, pack, name, *args, **kwargs):
         cmd = self.cmds[pack][name]
-        ottocmd = self._load_cmd(pack, name, cmd)() # Import & __init__
+        ottocmd = self._load_cmd(pack, name, cmd)(self) # Import & __init__
         ottocmd.run(*args, **kwargs)
 
     def run(self, name, *args, **kwargs):

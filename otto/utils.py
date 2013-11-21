@@ -16,6 +16,9 @@ class OttoCmd(object):
     """Base class for all `otto` commands"""
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, store):
+        self._store = store
+
     @classmethod
     def _name(cls):
         return cls.__name__.lower()
