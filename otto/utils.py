@@ -30,6 +30,8 @@ class OttoCmd(object):
         print "Usage:\n  $ otto %s %s" % (self._name(), ' '.join(args))
         sys.exit()
 
+isOttoCmd = lambda cmd: OttoCmd in getattr(cmd, '__bases__', [])
+
 def _config_dir_and_path(config_path):
     if config_path is None:
         config_dir = LOCAL_DIR
