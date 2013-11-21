@@ -27,7 +27,7 @@ class CmdStore(object):
                         self._add_cmd(
                                 pack,
                                 name,
-                                os.path.join(cmds_dir, path)
+                                path
                                 )
         except Exception as e:
             pass
