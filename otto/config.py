@@ -76,8 +76,6 @@ class CmdStore(object):
 
     def run(self, name, *args, **kwargs):
         pack, cmd = self.lookup(name)
-        if pack is None:
-            raise Exception("Can't look up cmd %s")
         self._run(pack, cmd, *args, **kwargs)
 
     def lookup(self, name):
@@ -106,13 +104,11 @@ class CmdStore(object):
         if pack and cmd:
             return pack, cmd
         else:
-            info("Couldn't find %s" % name)
+            info("Couldn't lookup '%s'" % name)
             bail()
 
     def docs(self, name):
         pack, cmd = self.lookup(name)
-        if pack is None:
-            raise Exception("Can't look up cmd %s")
         docs = self.cmds[pack][cmd].__doc__
         if docs is None:
             print "%s:%s doesn't seem to have a docstring." % (pack, cmd)
