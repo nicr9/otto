@@ -35,7 +35,7 @@ class CmdStore(object):
             self._dirs[pack] = cmds_dir
 
     def _add_cmd(self, pack, name, cmd):
-        assert isinstance(cmd, OttoCmd) or os.path.isfile(cmd)
+        assert os.path.isfile(cmd)
         self.packs.add(pack)
         cmds = self.cmds.setdefault(pack, {})
         cmds[name] = cmd
