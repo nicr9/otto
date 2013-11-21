@@ -1,7 +1,7 @@
 import os.path
 import imp
 from otto import LOCAL_CMDS_DIR
-from otto.utils import info, bail
+from otto.utils import info, bail, isOttoCmd
 
 from lament import *
 
@@ -23,10 +23,10 @@ class CmdStore(object):
         try:
             with ConfigFile(os.path.join(cmds_dir, CMDS_FILE)) as config:
                 if 'cmds' in config:
-                    for module, path in config['cmds'].iteritems():
-                        self._load_cmd(
+                    for name, path in config['cmds'].iteritems():
+                        self._add_cmd(
                                 pack,
-                                module,
+                                name,
                                 os.path.join(cmds_dir, path)
                                 )
         except Exception as e:
@@ -34,20 +34,25 @@ class CmdStore(object):
         else:
             self._dirs[pack] = cmds_dir
 
-    def _load_cmd(self, pack, module, path):
-        try:
-            temp = imp.load_source(
-                    module,
-                    path
-                    )
-            cmd_class = getattr(temp, module.capitalize(), None)
-            if cmd_class is None:
-                print module, "could not be loaded from %s" % load_from
-            else:
-                self.packs.add(pack)
+    def _add_cmd(self, pack, name, cmd):
+        assert isinstance(cmd, OttoCmd) or os.path.isfile(cmd)
+        self.packs.add(pack)
+        cmds = self.cmds.setdefault(pack, {})
+        cmds[name] = cmd
 
-                cmds = self.cmds.setdefault(pack, {})
-                cmds[module] = cmd_class
+    def _load_cmd(self, pack, name, cmd_ref):
+        if isOttoCmd(cmd_ref):
+            return cmd_ref
+        try:
+            cmd_module = imp.load_source(
+                    name,
+                    cmd_ref
+                    )
+            cmd_class = getattr(cmd_module, name.capitalize(), None)
+            if cmd_class is None:
+                print name, "could not be loaded from", cmd_ref
+            else:
+                return cmd_class
         except SyntaxError as e:
             print "Whoops, syntax error found:"
             print "File:%s (%s, %s)" % e.args[1][:3]
@@ -71,8 +76,10 @@ class CmdStore(object):
         else:
             self._print(pack)
 
-    def _run(self, pack, cmd, *args, **kwargs):
-        self.cmds[pack][cmd]().run(*args, **kwargs)
+    def _run(self, pack, name, *args, **kwargs):
+        cmd = self.cmds[pack][name]
+        ottocmd = self._load_cmd(pack, name, cmd)() # Import & __init__
+        ottocmd.run(*args, **kwargs)
 
     def run(self, name, *args, **kwargs):
         pack, cmd = self.lookup(name)
