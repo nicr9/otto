@@ -94,17 +94,17 @@ class CmdStore(object):
                 bail()
 
         else:
-            if 'local' in self.cmds:
-                if name in self.cmds['local']:
-                    pack = 'local'
+            if name in self.cmds['base']:
+                pack = 'base'
 
             installed = self.packs - set(['base', 'local'])
             for key in installed:
                 if name in self.cmds[key]:
                     pack = key
 
-            if name in self.cmds['base']:
-                pack = 'base'
+            if 'local' in self.cmds:
+                if name in self.cmds['local']:
+                    pack = 'local'
 
             cmd = name
 
