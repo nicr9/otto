@@ -6,12 +6,16 @@ import os
 import os.path
 
 class New(OttoCmd):
-    """Used to create boilerplate for new local commands.
+    """Used to create new cmds.
 
-For example, if you want to create a new command "do_something" with the argument "with" you would run the following:
-  $ otto new do_something with
+For example, if you want to create a new local cmds "new_cmd" with the argument "arg" you would run the following:
+  $ otto new new_cmd arg
 
-This will create a hidden directory with the boilerplate code ready for you to extend and a config file enabling the new command."""
+This will create a hidden directory, modify any config files and open vim with any boilerplate code ready for you to work on.
+
+If you want to create a new packaged cmd, you can specify the pack like this:
+  $ otto new pack_name:new_cmd
+"""
 
     cmd_template = """import otto.utils as otto
 
@@ -67,7 +71,7 @@ class %s(otto.OttoCmd):
 
     def run(self, *args):
         if not args:
-            self.cmd_usage(['new_command_name', '[cmd_arg_1 ...]'])
+            self.cmd_usage(['new_cmd_name', '[cmd_arg_1 ...]'])
         else:
             pack, cmd = self._split(args[0])
             cmd_args = args[1:]
@@ -83,29 +87,39 @@ class %s(otto.OttoCmd):
                 self._create_cmd(cmd, cmd_args, cmd_dir, pack, GLOBAL_CONFIG)
 
 class Edit(OttoCmd):
+    """Edit local or packaged cmds.
+
+If you want to edit a local cmd called "cmd_name":
+  $ otto edit cmd_name
+
+To edit packaged cmds, specify the pack like this:
+  $ otto edit pack_name:cmd_name
+"""
+
     def run(self, *args):
         if len(args) != 1:
-            self.cmd_usage(['command_name'])
+            self.cmd_usage(['cmd_name'])
         else:
             pack, name = self._store.lookup(args[0])
             if pack == 'base':
-                info("Sorry, you can't edit base commands like %s" % name)
+                info("Sorry, you can't edit base cmds like %s" % name)
             else:
                 cmd_path = self._store.cmds[pack][name]
                 edit_file(cmd_path)
 
 class Remember(OttoCmd):
-    """Binds named arguments to a command.
+    """Binds a list of arguments to a cmd.
 
-For example, if you wanted to bind the value "this" to the do_something command's argument named "with":
-  $ otto remember do_something with:this
+For example, if you wanted to always pass the value "5" to the "cmd_name" cmd:
+  $ otto remember cmd_name 5
 
-To bind more complicated values, you can wrap the binding in quotes like this:
-  $ otto remember do_something "with:something else altogether" """
+You can bind as many arguments as you want separated by spaces. To bind values with spaces, you can wrap them in quotes like this:
+  $ otto remember cmd_name "The cake is a lie"
+"""
 
     def run(self, *args):
         if not args:
-            self.cmd_usage(['command_name', '[arg_to_remember1 ...]'])
+            self.cmd_usage(['cmd_name', '[arg_to_remember1 ...]'])
         else:
             cmd_name = args[0]
             cmd_args = args[1:]
@@ -165,7 +179,7 @@ class Pack(OttoCmd):
         rmtree(pack_name)
 
 class Install(OttoCmd):
-    """Install a package as global commands"""
+    """Install a package as global cmds"""
 
     def run(self, pack_path):
         from shutil import copytree, rmtree
