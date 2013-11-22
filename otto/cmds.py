@@ -20,6 +20,36 @@ class %s(otto.OttoCmd):
         pass
 """
 
+    def _create_cmd(self, cmd_name, cmd_args, cmd_dir, pack_name, pack_config):
+        file_name = cmd_name + '.py'
+        cmd_path = os.path.join(cmd_dir, file_name)
+        cmds_file = os.path.join(cmd_dir, 'cmds.json')
+
+        # Create dir structure
+        ensure_dir(cmd_dir)
+
+        # Config
+        with ConfigFile(pack_config, True) as config:
+            config['packs'] = {
+                    pack_name: cmd_dir,
+                    }
+
+        with ConfigFile(cmds_file, True) as local_cmds:
+            cmds = local_cmds.setdefault('cmds', {})
+            cmds[cmd_name] = cmd_path
+
+        # Create template for cmd
+        with open(cmd_path, 'w') as cmd_file:
+            cmd_file.write(
+                    self.cmd_template % (
+                            cmd_name.capitalize(),
+                            ', '.join(cmd_args)
+                            )
+                    )
+
+        # Allow user to implement new cmd
+        edit_file(cmd_path)
+
     def run(self, *args):
         if not args:
             self.cmd_usage(['new_command_name', '[cmd_arg_1 ...]'])
@@ -27,34 +57,7 @@ class %s(otto.OttoCmd):
             cmd_name = args[0]
             cmd_args = args[1:]
 
-            file_name = cmd_name + '.py'
-            cmd_path = os.path.join(LOCAL_CMDS_DIR, file_name)
-            cmds_file = os.path.join(LOCAL_CMDS_DIR, 'cmds.json')
-
-            # Create dir structure
-            ensure_dir(LOCAL_CMDS_DIR)
-
-            # Config
-            with ConfigFile(LOCAL_CONFIG, True) as config:
-                config['packs'] = {
-                        'local': LOCAL_CMDS_DIR,
-                        }
-
-            with ConfigFile(cmds_file, True) as local_cmds:
-                cmds = local_cmds.setdefault('cmds', {})
-                cmds[cmd_name] = cmd_path
-
-            # Create template for cmd
-            with open(cmd_path, 'w') as cmd_file:
-                cmd_file.write(
-                        self.cmd_template % (
-                                cmd_name.capitalize(),
-                                ', '.join(cmd_args)
-                                )
-                        )
-
-            # Allow user to implement new cmd
-            edit_file(cmd_path)
+            self._create_cmd(cmd_name, cmd_args, LOCAL_CMDS_DIR, 'local', LOCAL_CONFIG)
 
 class Edit(OttoCmd):
     def run(self, *args):
