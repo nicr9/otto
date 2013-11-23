@@ -34,9 +34,8 @@ class %s(otto.OttoCmd):
 
         # Config
         with ConfigFile(pack_config, True) as config:
-            config['packs'] = {
-                    pack_name: cmd_dir,
-                    }
+            packs = config.setdefault('packs', {})
+            packs[pack_name] = cmd_dir
 
         with ConfigFile(cmds_file, True) as local_cmds:
             cmds = local_cmds.setdefault('cmds', {})
