@@ -131,15 +131,6 @@ You can bind as many arguments as you want separated by spaces. To bind values w
                         remember=arg_d
                         )
 
-class Cleanext(OttoCmd):
-    """This will erase all files with a particular extension from this directory and all sub directories.
-
-For example, to clean up all .pyc files run the following:
-  $ otto ext_cleanup pyc"""
-
-    def run(self, ext):
-        shell(r'find ./ -type f -name "*.%s" -exec rm -f {} \;' % ext)
-
 class Pack(OttoCmd):
     """Turn .otto into a package to be distributed/installed"""
 
@@ -244,18 +235,7 @@ class Uninstall(OttoCmd):
         # Delete pack dir
         rmtree(os.path.join(GLOBAL_DIR, dialog.result))
 
-class gitcheck(OttoCmd):
-    """Make sure no '# TODO:'s were left behind before commiting"""
-    def run(self):
-        import re
-        outp = shell(r'git diff --cached').splitlines()
-        info('The following lines with todos were found:')
-        for line in outp:
-            if re.search('#\s*TODO', line):
-                if re.search('^[+-]', line):
-                    print line
-
-class wait(OttoCmd):
+class Wait(OttoCmd):
     """Pause for X number of seconds"""
     def run(self, secs):
         from time import sleep
