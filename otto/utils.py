@@ -73,23 +73,23 @@ def ensure_dir(path):
     if not os.path.isdir(path):
         os.makedirs(path)
 
+def blue_format(msg):
+    return "\033[94m%s\033[0m" % str(msg)
+
 def bold_format(msg):
     return "\033[1m%s\033[0m" % str(msg)
 
-def info_format(msg):
-    return "\033[94m%s\033[0m" % str(msg)
-
-def bold(msg):
-    print bold_format(msg)
+def blue(msg):
+    print blue_format(msg)
 
 def info(msg):
-    print info_format(msg)
+    print bold_format(msg)
 
 def shell(cmd, echo=True):
     outp = ''
     try:
         if echo:
-            bold(" $ %s" % cmd)
+            blue(" $ %s" % cmd)
         outp = subprocess.check_output(cmd, shell=True)
     except CalledProcessError as e:
         pass
@@ -112,7 +112,7 @@ class Dialog(object):
         self._validate()
 
         if self.header is not None:
-            bold("%s : " % self.header)
+            info("%s : " % self.header)
 
         indexed = values.keys() if isinstance(values, dict) else values
         for indx, val in enumerate(indexed):
