@@ -6,11 +6,74 @@ import json
 import subprocess
 
 from getpass import getpass
+from lament import ConfigFile
+from shutil import copytree, rmtree
+
 from otto import *
 
 def bail():
     print "\n\nExiting..."
     sys.exit()
+
+def move_pack(src_path, src_pack, dest_pack):
+    dest = os.path.join(src_path, dest_pack)
+    # Add pack to dest config
+    with ConfigFile(os.path.join(src_path, 'config.json')) as config:
+        config['packs'][dest_pack] = dest_pack
+        del config['packs'][src_pack]
+
+    # copytree to dest
+    copytree(
+            os.path.join(src_path, src_pack),
+            dest,
+            )
+
+    # change cmd paths
+    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
+        for key in config['cmds']:
+            config['cmds'][key] = os.path.join(dest, "%s.py" % key)
+
+def clone_pack(src_path, src_pack, dest_path, dest_pack):
+    dest = os.path.join(dest_path, dest_pack)
+
+    # Ensure dest dir
+    ensure_dir(dest_path)
+
+    # Add pack to dest config
+    with ConfigFile(os.path.join(dest_path, 'config.json'), True) as config:
+        packs = config.setdefault('packs', {})
+        packs[dest_pack] = dest_pack
+
+    # copytree to dest
+    copytree(
+            os.path.join(src_path, src_pack),
+            dest
+            ) # TODO: What happens if this pack already exists?
+
+    # change cmd paths
+    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
+        for key in config['cmds']:
+            rel_path = os.path.join(dest, "%s.py" % key)
+            import pdb; pdb.set_trace()
+            config['cmds'][key] = os.path.abspath(rel_path)
+
+def clone_all(src, dest): # TODO: Test this
+    ensure_dir(dest)
+
+    # Add pack to dest config
+    with ConfigFile(os.path.join(src, 'config.json')) as config:
+        src_packs = config.setdefault('packs', {})
+        for pack_name, pack_path in src_packs:
+            clone_pack(
+                    os.path.join(src, pack_path),
+                    pack_name,
+                    os.path.join(dest, pack_path),
+                    pack_name,
+                    )
+
+    with ConfigFile(os.path.join(dest, 'config.json')) as config:
+        dest_packs = config.setdefault('packs', {})
+        dest_packs.update(src_packs)
 
 class OttoCmd(object):
     """Base class for all `otto` commands"""

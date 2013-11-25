@@ -135,38 +135,22 @@ class Pack(OttoCmd):
     """Turn .otto into a package to be distributed/installed"""
 
     def run(self, pack_name):
-        from shutil import copytree, rmtree
         pack_path = os.path.basename(pack_name + PACK_EXT)
-        pack_local = os.path.join(pack_name, 'local')
-        pack_pack = os.path.join(pack_name, pack_name)
+        pack_root = './pack_root'
 
         # Make copy of .otto/
-        info("Copying .otto...")
-        copytree(LOCAL_DIR, pack_name)
+        info("Cloning local...")
+        clone_pack(LOCAL_DIR, 'local', pack_root, pack_name)
 
-        info("Modifying copy...")
-        copytree(
-                pack_local,
-                pack_pack,
-                )
-        rmtree(pack_local)
-        shell(r'find %s -type f -name "*.pyc" -exec rm -f {} \;' % pack_name)
-
-        # Edit json files
-        with ConfigFile(os.path.join(pack_name, 'config.json')) as config:
-            config['packs'][pack_name] = pack_name
-            del config['packs']['local']
-
-        with ConfigFile(os.path.join(pack_pack, 'cmds.json')) as cmds:
-            for key in cmds['cmds']:
-                cmds['cmds'][key] = os.path.join(pack_name, "%s.py" % key)
+        info("Cleaning up a bit...")
+        shell(r'find %s -type f -name "*.pyc" -exec rm -f {} \;' % pack_root)
 
         # Tar up package
         info("Packing up...")
-        shell(r'tar -czf %s %s' % (pack_path, pack_name))
+        shell(r'tar -czf %s %s' % (pack_path, pack_root))
 
         # Cleanup
-        rmtree(pack_name)
+        rmtree(pack_root)
 
 class Install(OttoCmd):
     """Install a package as global cmds"""
