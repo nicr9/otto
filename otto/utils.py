@@ -15,6 +15,15 @@ def bail():
     print "\n\nExiting..."
     sys.exit()
 
+def get_packs(src_dir):
+    with ConfigFile(os.path.join(src_dir, 'config.json')) as config:
+        return config.get('packs', {})
+
+def update_packs(src_dir, new_packs):
+    with ConfigFile(os.path.join(src_dir, 'config.json'), True) as config:
+        packs = config.setdefault('packs', {})
+        packs.update(new_packs)
+
 def move_pack(src_path, src_pack, dest_pack):
     dest = os.path.join(src_path, dest_pack)
     # Add pack to dest config
@@ -54,7 +63,6 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack):
     with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
         for key in config['cmds']:
             rel_path = os.path.join(dest, "%s.py" % key)
-            import pdb; pdb.set_trace()
             config['cmds'][key] = os.path.abspath(rel_path)
 
 def clone_all(src, dest): # TODO: Test this
@@ -71,9 +79,7 @@ def clone_all(src, dest): # TODO: Test this
                     pack_name,
                     )
 
-    with ConfigFile(os.path.join(dest, 'config.json')) as config:
-        dest_packs = config.setdefault('packs', {})
-        dest_packs.update(src_packs)
+    update_packs(dest, src_packs)
 
 class OttoCmd(object):
     """Base class for all `otto` commands"""

@@ -171,16 +171,12 @@ class Install(OttoCmd):
         temp_dir = os.path.join(install_temp, pack_name)
 
         # Copy pack info to global config
-        with ConfigFile(os.path.join(temp_dir, 'config.json')) as pack_config:
-            to_install = pack_config['packs']
-
+        to_install = get_packs(temp_dir)
         for key, val in to_install.iteritems():
             to_install[key] = os.path.join(GLOBAL_DIR, val)
+        update_packs(GLOBAL_DIR, to_install)
 
-        with ConfigFile(GLOBAL_CONFIG, True) as installed_config:
-            packs = installed_config.setdefault('packs', {})
-            packs.update(to_install)
-
+        # Fix paths to cmd files
         with ConfigFile(os.path.join(temp_dir, pack_name, 'cmds.json')) as cmds:
             for key, val in cmds['cmds'].iteritems():
                 cmds['cmds'][key] = os.path.join(GLOBAL_DIR, val)
@@ -199,21 +195,15 @@ class Uninstall(OttoCmd):
     def run(self):
         from shutil import rmtree
         # Get list of installed packages
+        installed_packs = get_packs(GLOBAL_DIR)
+
+        # Ask user which to uninstall
+        dialog = Dialog("Which pack do you want to uninstall?")
+        dialog.choose(installed_packs.keys())
+        info('Uninstalling %s...' % dialog.result)
+
+        # Remove pack from config
         with ConfigFile(GLOBAL_CONFIG) as config:
-            if 'packs' in config:
-                installed_packs = config['packs']
-            else:
-                installed_packs = {}
-            if not installed_packs:
-                info("No packs installed")
-                bail()
-
-            # Ask user which to uninstall
-            dialog = Dialog("Which pack do you want to uninstall?")
-            dialog.choose(installed_packs.keys())
-            info('Uninstalling %s...' % dialog.result)
-
-            # Remove pack from config
             config['packs'].pop(dialog.result)
 
         # Delete pack dir
