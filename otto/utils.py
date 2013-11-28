@@ -47,7 +47,8 @@ def move_pack(src_path, src_pack, dest_pack):
     # change cmd paths
     fix_cmds(dest)
 
-def clone_pack(src_path, src_pack, dest_path, dest_pack):
+def clone_pack(src_path, src_pack, dest_path, dest_pack=None):
+    dest_pack = dest_pack or src_pack
     dest = os.path.join(dest_path, dest_pack)
 
     # Ensure dest dir
@@ -56,7 +57,7 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack):
     # Add pack to dest config
     with ConfigFile(os.path.join(dest_path, 'config.json'), True) as config:
         packs = config.setdefault('packs', {})
-        packs[dest_pack] = dest_pack
+        packs[dest_pack] = dest
 
     # copytree to dest
     copytree(
