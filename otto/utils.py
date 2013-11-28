@@ -24,6 +24,13 @@ def update_packs(src_dir, new_packs):
         packs = config.setdefault('packs', {})
         packs.update(new_packs)
 
+def fix_cmds(dest):
+    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
+        cmds = config.setdefault('cmds', {})
+        for key in cmds:
+            rel_path = os.path.join(dest, "%s.py" % key)
+            cmds[key] = os.path.abspath(rel_path)
+
 def move_pack(src_path, src_pack, dest_pack):
     dest = os.path.join(src_path, dest_pack)
     # Add pack to dest config
@@ -38,9 +45,7 @@ def move_pack(src_path, src_pack, dest_pack):
             )
 
     # change cmd paths
-    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
-        for key in config['cmds']:
-            config['cmds'][key] = os.path.join(dest, "%s.py" % key)
+    fix_cmds(dest)
 
 def clone_pack(src_path, src_pack, dest_path, dest_pack):
     dest = os.path.join(dest_path, dest_pack)
@@ -60,10 +65,7 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack):
             ) # TODO: What happens if this pack already exists?
 
     # change cmd paths
-    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
-        for key in config['cmds']:
-            rel_path = os.path.join(dest, "%s.py" % key)
-            config['cmds'][key] = os.path.abspath(rel_path)
+    fix_cmds(dest)
 
 def clone_all(src, dest): # TODO: Test this
     ensure_dir(dest)

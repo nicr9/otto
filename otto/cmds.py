@@ -1,9 +1,11 @@
+import os
+import os.path
+
+from lament import ConfigFile
+
 from otto import *
 from otto.utils import *
 from otto.config import CmdsConfig
-from lament import ConfigFile
-import os
-import os.path
 
 class New(OttoCmd):
     """Used to create new cmds.
