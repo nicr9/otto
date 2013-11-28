@@ -159,7 +159,6 @@ class Install(OttoCmd):
 
     def run(self, pack_path):
         from shutil import copytree, rmtree
-        pack_name = os.path.basename(pack_path).split(PACK_EXT)[0]
         install_temp = os.path.join(GLOBAL_DIR, '_installing') 
 
         ensure_dir(install_temp)
@@ -170,24 +169,19 @@ class Install(OttoCmd):
             install_temp,
             ))
 
-        temp_dir = os.path.join(install_temp, pack_name)
+        temp_dir = os.path.join(install_temp, 'pack_root')
 
         # Copy pack info to global config
         to_install = get_packs(temp_dir)
-        for key, val in to_install.iteritems():
-            to_install[key] = os.path.join(GLOBAL_DIR, val)
-        update_packs(GLOBAL_DIR, to_install)
-
-        # Fix paths to cmd files
-        with ConfigFile(os.path.join(temp_dir, pack_name, 'cmds.json')) as cmds:
-            for key, val in cmds['cmds'].iteritems():
-                cmds['cmds'][key] = os.path.join(GLOBAL_DIR, val)
-
-        # Copy pack cmds to GLOBAL_DIR
-        copytree(
-                os.path.join(temp_dir, pack_name),
-                os.path.join(GLOBAL_DIR, pack_name),
-                )
+        if len(to_install) > 1:
+            d = Dialog("Which pack would you like to install")
+            pack_name = d.result
+        elif len(to_install) == 1:
+            pack_name = to_install.keys()[0]
+        else:
+            info("No packs found in %s" % pack_path)
+            bail()
+        clone_pack(temp_dir, pack_name, GLOBAL_DIR)
 
         # Clean up
         rmtree(install_temp)
