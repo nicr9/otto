@@ -84,6 +84,15 @@ def clone_all(src, dest): # TODO: Test this
 
     update_packs(dest, src_packs)
 
+def rm_pack(path, name):
+    # Remove pack from config
+    with ConfigFile(os.path.join(path, 'config.json')) as config:
+        packs = config.get('packs', {})
+        packs.pop(name, None)
+
+    # Delete pack dir
+    rmtree(os.path.join(GLOBAL_DIR, name))
+
 class OttoCmd(object):
     """Base class for all `otto` commands"""
     __metaclass__ = abc.ABCMeta

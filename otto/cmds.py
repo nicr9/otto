@@ -198,12 +198,7 @@ class Uninstall(OttoCmd):
         dialog.choose(installed_packs.keys())
         info('Uninstalling %s...' % dialog.result)
 
-        # Remove pack from config
-        with ConfigFile(GLOBAL_CONFIG) as config:
-            config['packs'].pop(dialog.result)
-
-        # Delete pack dir
-        rmtree(os.path.join(GLOBAL_DIR, dialog.result))
+        rm_pack(GLOBAL_DIR, dialog.result)
 
 class Wait(OttoCmd):
     """Pause for X number of seconds"""
