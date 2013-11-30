@@ -2,12 +2,12 @@ from distutils.core import setup
 
 setup(
     name='otto',
-    version='0.2',
+    version='v0.4',
     author='Nic Roland',
     author_email='nicroland9@gmail.com',
     packages=['otto'],
     data_files=[('otto_res', ['res/config.json', 'res/done.wav'])],
     scripts=['bin/otto'],
-    description='For automating your workflow',
+    description='Automate your workflow with ease.',
     long_description=open('README.rst').read(),
 )
