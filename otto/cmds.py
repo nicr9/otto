@@ -10,12 +10,12 @@ from otto.config import CmdsConfig
 class New(OttoCmd):
     """Used to create new cmds.
 
-For example, if you want to create a new local cmds "new_cmd" with the argument "arg" you would run the following:
+To create a new local cmd "new_cmd" with the argument "arg" you would run the following:
   $ otto new new_cmd arg
 
-This will create a hidden directory, modify any config files and open vim with any boilerplate code ready for you to work on.
+This will create the folder .otto/ along with the necessary config files and open vim with the boilerplate code ready for you to work on.
 
-If you want to create a new packaged cmd, you can specify the pack like this:
+If you would prefer to create a the new cmd in a pack, you can specify the pack like this:
   $ otto new pack_name:new_cmd
 """
 
@@ -114,7 +114,7 @@ class Remember(OttoCmd):
 For example, if you wanted to always pass the value "5" to the "cmd_name" cmd:
   $ otto remember cmd_name 5
 
-You can bind as many arguments as you want separated by spaces. To bind values with spaces, you can wrap them in quotes like this:
+You can bind as many arguments as you want separated by spaces. To bind values that contain spaces, you can wrap them in quotes like this:
   $ otto remember cmd_name "The cake is a lie"
 """
 
@@ -134,7 +134,11 @@ You can bind as many arguments as you want separated by spaces. To bind values w
                         )
 
 class Pack(OttoCmd):
-    """Turn .otto into a package to be distributed/installed"""
+    """Turn all local cmds into a package to be distributed/installed.
+    
+The resulting .opack file and the pack it contains will get their name from the argument you provide:
+  $ otto pack pack_name
+"""
 
     def run(self, pack_name):
         pack_path = os.path.basename(pack_name + PACK_EXT)
@@ -155,7 +159,13 @@ class Pack(OttoCmd):
         rmtree(pack_root)
 
 class Install(OttoCmd):
-    """Install a package as global cmds"""
+    """Install any pack from a .opack.
+    
+You specify the .opack like so:
+  $ otto install my_pack.opack
+
+If the .opack contains multiple packs, it will ask you to choose which to install.
+"""
 
     def run(self, pack_path):
         from shutil import copytree, rmtree
@@ -187,7 +197,7 @@ class Install(OttoCmd):
         rmtree(install_temp)
 
 class Uninstall(OttoCmd):
-    """Interactive prompt to remove installed package"""
+    """Remove installed packages. This cmd takes no arguments and will guide you through the process interactively."""
     def run(self):
         from shutil import rmtree
         # Get list of installed packages
@@ -201,7 +211,11 @@ class Uninstall(OttoCmd):
         rm_pack(GLOBAL_DIR, dialog.result)
 
 class Wait(OttoCmd):
-    """Pause for X number of seconds"""
+    """A simple timer.
+
+To pause for 5 seconds:
+  $ otto wait 5
+"""
     def run(self, secs):
         from time import sleep
         if secs.isdigit():
