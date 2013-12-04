@@ -78,8 +78,7 @@ class %s(otto.OttoCmd):
             cmd_args = args[1:]
 
             if not self._validate(pack, cmd):
-                info("Sorry, you can't do that")
-                bail()
+                bail("Sorry, you can't do that")
 
             if pack == 'local':
                 self._create_cmd(cmd, cmd_args, LOCAL_CMDS_DIR, 'local', LOCAL_CONFIG)
@@ -189,8 +188,7 @@ If the .opack contains multiple packs, it will ask you to choose which to instal
         elif len(to_install) == 1:
             pack_name = to_install.keys()[0]
         else:
-            info("No packs found in %s" % pack_path)
-            bail()
+            bail("No packs found in %s" % pack_path)
         clone_pack(temp_dir, pack_name, GLOBAL_DIR)
 
         # Clean up

@@ -90,8 +90,7 @@ class CmdStore(object):
         if ':' in name:
             pack, cmd = name.split(':')[:2]
             if pack not in self.cmds:
-                info("Couldn't find %s, are you sure it's installed?" % pack)
-                bail()
+                bail("Couldn't find %s, are you sure it's installed?" % pack)
 
         else:
             if name in self.cmds['base']:
@@ -111,8 +110,7 @@ class CmdStore(object):
         if pack and cmd:
             return pack, cmd
         else:
-            info("Couldn't lookup '%s'" % name)
-            bail()
+            bail("Couldn't lookup '%s'" % name)
 
     def docs(self, name):
         pack, cmd = self.lookup(name)
