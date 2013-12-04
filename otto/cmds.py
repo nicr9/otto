@@ -173,10 +173,13 @@ If the .opack contains multiple packs, it will ask you to choose which to instal
         ensure_dir(install_temp)
 
         # Untar pack
-        shell(r'tar -xzf %s -C %s' % (
-            pack_path, 
-            install_temp,
-            ))
+        if os.path.isfile(pack_path):
+            shell(r'tar -xzf %s -C %s' % (
+                pack_path,
+                install_temp,
+                ))
+        else:
+            bail("%s doesn't exist" % pack_path)
 
         temp_dir = os.path.join(install_temp, 'pack_root')
 
