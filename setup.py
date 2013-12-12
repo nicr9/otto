@@ -9,5 +9,5 @@ setup(
     data_files=[('otto_res', ['res/config.json', 'res/done.wav'])],
     scripts=['bin/otto'],
     description='Automate your workflow with ease.',
-    long_description=open('README.rst').read(),
+    #long_description=open('README.rst').read(),
 )
