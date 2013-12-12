@@ -54,9 +54,8 @@ class CmdStore(object):
             else:
                 return cmd_class
         except SyntaxError as e:
-            print "Whoops, syntax error found:"
-            print "File:%s (%s, %s)" % e.args[1][:3]
-            sys.exit()
+            errmsg = "Syntax error found:\nFile:%s (%s, %s)" % e.args[1][:3]
+            bail(errmsg)
         except Exception as e:
             raise e
 
