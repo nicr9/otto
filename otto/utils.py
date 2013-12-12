@@ -166,12 +166,15 @@ def blue(msg):
 def info(msg):
     print bold_format(msg)
 
-def shell(cmd, echo=True):
+def shell(cmd, echo=True, stdout=False):
     outp = ''
     try:
         if echo:
             blue(" $ %s" % cmd)
-        outp = subprocess.check_output(cmd, shell=True)
+        if stdout:
+            subprocess.call(cmd, shell=True)
+        else:
+            outp = subprocess.check_output(cmd, shell=True)
     except CalledProcessError as e:
         pass
     finally:
