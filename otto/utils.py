@@ -279,9 +279,9 @@ class Dialog(object):
             bail()
 
 class ChangePath(object):
-    def __init__(self, path):
+    def __init__(self, path='~'):
         self._base_dir = os.getcwd()
-        self._dest_dir = path
+        self._dest_dir = os.path.expanduser(path)
 
     def __enter__(self):
         os.chdir(self._dest_dir)
