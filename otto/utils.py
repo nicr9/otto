@@ -223,9 +223,16 @@ class Dialog(object):
                 continue
 
             if 0 <= ans < len(values):
+                # self.index
                 key = indexed[ans] if isinstance(values, dict) else ans
-                self.result = values[key]
                 self.index = ans
+
+                # self.result
+                self.result = values[key]
+
+                # self.key
+                if isinstance(values, dict):
+                    self.key = key
                 break
             else:
                 continue
