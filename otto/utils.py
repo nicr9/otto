@@ -157,11 +157,17 @@ def ensure_dir(path):
 def blue_format(msg):
     return "\033[94m%s\033[0m" % str(msg)
 
+def orange_format(msg):
+    return "\033[91m%s\033[0m" % str(msg)
+
 def bold_format(msg):
     return "\033[1m%s\033[0m" % str(msg)
 
 def blue(msg):
     print blue_format(msg)
+
+def orange(msg):
+    print orange_format(msg)
 
 def info(msg):
     print bold_format(msg)
@@ -285,8 +291,10 @@ class ChangePath(object):
 
     def __enter__(self):
         os.chdir(self._dest_dir)
+        orange("-> %s" % os.getcwd())
 
     def __exit__(self, a, b, c):
+        orange("-> %s" % self._base_dir)
         os.chdir(self._base_dir)
 
 class SingleLine(object):
