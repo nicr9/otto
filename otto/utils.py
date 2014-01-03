@@ -309,3 +309,11 @@ class SingleLine(object):
 
     def __exit__(self, a, b, c):
         self.stdout.write("\n")
+
+def debug_on():
+    global shell
+
+    def _debug(cmd, *args):
+        blue(" $ %s" % cmd)
+
+    shell = _debug
