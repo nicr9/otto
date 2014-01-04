@@ -206,10 +206,10 @@ class Uninstall(OttoCmd):
 
         # Ask user which to uninstall
         dialog = Dialog("Which pack do you want to uninstall?")
-        dialog.choose(installed_packs.keys())
-        info('Uninstalling %s...' % dialog.result)
+        dialog.choose(installed_packs)
+        info('Uninstalling %s...' % dialog.key)
 
-        rm_pack(GLOBAL_DIR, dialog.result)
+        rm_pack(GLOBAL_DIR, dialog.key)
 
 class Wait(OttoCmd):
     """A simple timer.
