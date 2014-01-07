@@ -330,5 +330,6 @@ def debug_on():
 
     def _debug(cmd, *args):
         blue(" $ %s" % cmd)
+        return ''
 
     shell = _debug
