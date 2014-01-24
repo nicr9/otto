@@ -148,6 +148,4 @@ class OttoConfig(LamentConfig):
 
     @config('tone', str)
     def tone(self, config, obj):
-        if not isfile(obj):
-            return config
         return obj
