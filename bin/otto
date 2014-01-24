@@ -47,7 +47,13 @@ class OttoDispatcher(object):
     def tone(self):
         if self.config.tone:
             path = os.path.join(RES_DIR, self.config.tone)
-            if os.path.isfile(path):
+
+            if os.path.isfile(self.config.tone):
+                try:
+                    shcall(['aplay', '-q', self.config.tone])
+                except Exception as e:
+                    print "Couldn't play tone (%s)" % e
+            elif os.path.isfile(path):
                 try:
                     shcall(['aplay', '-q', path])
                 except Exception as e:
