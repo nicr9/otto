@@ -46,13 +46,12 @@ class %s(otto.OttoCmd):
         # Allow user to implement new cmd
         edit_file(cmd_path)
 
-    def _validate(self, pack, cmd):
-        if pack == 'base':
-            return False
-        elif pack not in self._store.cmds:
-            return True
+    def _split(self, name):
+        cmd_split = name.split(':')
+        if len(cmd_split) >= 2:
+            return cmd_split[:2]
         else:
-            return cmd not in self._store.cmds[pack]
+            return 'local', name
 
     def run(self, *args):
         if not args:
@@ -61,7 +60,7 @@ class %s(otto.OttoCmd):
             pack, cmd = cmd_split(args[0], 'local')
             cmd_args = args[1:]
 
-            if not self._validate(pack, cmd):
+            if not self._store.is_available(pack, cmd):
                 bail("Sorry, you can't do that")
 
             if pack == 'local':
