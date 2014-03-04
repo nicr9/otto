@@ -125,6 +125,14 @@ class CmdStore(object):
     def export(self):
         return self._dirs
 
+    def is_available(self, pack, cmd):
+        if pack == 'base':
+            return False
+        elif pack not in self.cmds:
+            return True
+        else:
+            return cmd not in self.cmds[pack]
+
 class CmdsConfig(LamentConfig):
     @config('cmds', dict)
     def cmds(self, config, obj):

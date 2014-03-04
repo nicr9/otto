@@ -62,14 +62,6 @@ class %s(otto.OttoCmd):
         else:
             return 'local', name
 
-    def _validate(self, pack, cmd):
-        if pack == 'base':
-            return False
-        elif pack not in self._store.cmds:
-            return True
-        else:
-            return cmd not in self._store.cmds[pack]
-
     def run(self, *args):
         if not args:
             self.cmd_usage(['new_cmd_name', '[cmd_arg_1 ...]'])
@@ -77,7 +69,7 @@ class %s(otto.OttoCmd):
             pack, cmd = self._split(args[0])
             cmd_args = args[1:]
 
-            if not self._validate(pack, cmd):
+            if not self._store.is_available(pack, cmd):
                 bail("Sorry, you can't do that")
 
             if pack == 'local':
