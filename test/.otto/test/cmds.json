@@ -1,0 +1,6 @@
+{
+    "cmds": {
+        "test1": "/Users/nicroland/otto/test/.otto/test/test1.py", 
+        "test2": "/Users/nicroland/otto/test/.otto/test/test2.py"
+    }
+}
