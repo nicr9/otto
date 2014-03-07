@@ -7,6 +7,15 @@ from lament import *
 
 CMDS_FILE = 'cmds.json'
 
+def cmd_split(name):
+    """Given a name, split into (pack, cmd).
+
+    Pack should default to None if indeterminable."""
+    if ':' in name:
+        return name.split(':')[:2]
+    else:
+        return None, name
+
 class CmdStore(object):
     def __init__(self):
         self.packs = set()
@@ -84,32 +93,37 @@ class CmdStore(object):
         pack, cmd = self.lookup(name)
         self._run(pack, cmd, *args, **kwargs)
 
+    def installed_packs(self):
+        """Returns a set of available pack names, excluding base and local."""
+        return self.packs - set(['base', 'local'])
+
+    def find_pack(self, cmd):
+        """Given a cmd, determine which pack it belongs to."""
+        # Local cmds take presidence
+        if 'local' in self.cmds:
+            if cmd in self.cmds['local']:
+                return 'local'
+
+        # Then check installed cmds
+        for key in self.installed_packs():
+            if cmd in self.cmds[key]:
+                return key
+
+        # default to base cmds if able
+        if cmd in self.cmds['base']:
+            return 'base'
+
     def lookup(self, name):
-        pack, cmd = None, None
-        if ':' in name:
-            pack, cmd = name.split(':')[:2]
-            if pack not in self.cmds:
-                bail("Couldn't find %s, are you sure it's installed?" % pack)
+        """Given a name, determine the best possible pack and cmd."""
+        pack, cmd = cmd_split(name)
 
-        else:
-            if name in self.cmds['base']:
-                pack = 'base'
+        if pack is None:
+            pack = self.find_pack(cmd)
 
-            installed = self.packs - set(['base', 'local'])
-            for key in installed:
-                if name in self.cmds[key]:
-                    pack = key
-
-            if 'local' in self.cmds:
-                if name in self.cmds['local']:
-                    pack = 'local'
-
-            cmd = name
-
-        if pack and cmd:
+        if self.is_used(pack, cmd):
             return pack, cmd
         else:
-            bail("Couldn't lookup '%s'" % name)
+            bail("Couldn't lookup %s, are you sure it's installed?" % name)
 
     def docs(self, name):
         # Find OttoCmd class
