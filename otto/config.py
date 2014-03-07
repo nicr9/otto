@@ -133,6 +133,12 @@ class CmdStore(object):
         else:
             return cmd not in self.cmds[pack]
 
+    def is_used(self, pack, cmd):
+        if pack in self.cmds and cmd in self.cmds[pack]:
+            return True
+        else:
+            return False
+
 class CmdsConfig(LamentConfig):
     @config('cmds', dict)
     def cmds(self, config, obj):
