@@ -18,14 +18,14 @@ def cmd_split(name):
 
 class CmdStore(object):
     def __init__(self):
-        self.packs = set()
+        self.pack_keys = set()
         self.cmds = {}
         self._dirs = {}
         self._ready = False
 
     def init(self, default_cmds=None):
         self._ready = True
-        self.packs = set(['base'])
+        self.pack_keys = set(['base'])
         self.cmds['base'] = default_cmds
 
     def loadpack(self, pack, cmds_dir):
@@ -45,7 +45,7 @@ class CmdStore(object):
 
     def _add_cmd(self, pack, name, cmd):
         assert os.path.isfile(cmd)
-        self.packs.add(pack)
+        self.pack_keys.add(pack)
         cmds = self.cmds.setdefault(pack, {})
         cmds[name] = cmd
 
@@ -69,7 +69,7 @@ class CmdStore(object):
             raise e
 
     def _print(self, pack):
-        if pack in self.packs:
+        if pack in self.pack_keys:
             print "* %s" % pack
             for cmd in self.cmds[pack]:
                 print "  - %s" % cmd
@@ -94,7 +94,7 @@ class CmdStore(object):
 
     def installed_packs(self):
         """Returns a set of available pack names, excluding base and local."""
-        return self.packs - set(['base', 'local'])
+        return self.pack_keys - set(['base', 'local'])
 
     def find_pack(self, cmd):
         """Given a cmd, determine which pack it belongs to."""
