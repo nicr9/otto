@@ -20,7 +20,7 @@ class CmdStore(object):
     def __init__(self):
         self.pack_keys = set()
         self.pack_cmds = {}
-        self._dirs = {}
+        self._pack_dirs = {}
         self._ready = False
 
     def init(self, default_cmds=None):
@@ -28,9 +28,9 @@ class CmdStore(object):
         self.pack_keys = set(['base'])
         self.pack_cmds['base'] = default_cmds
 
-    def loadpack(self, pack, cmds_dir):
+    def loadpack(self, pack, pack_dir):
         try:
-            with ConfigFile(os.path.join(cmds_dir, CMDS_FILE)) as config:
+            with ConfigFile(os.path.join(pack_dir, CMDS_FILE)) as config:
                 if 'cmds' in config:
                     for name, path in config['cmds'].iteritems():
                         self._add_cmd(
@@ -41,25 +41,26 @@ class CmdStore(object):
         except Exception as e:
             pass
         else:
-            self._dirs[pack] = cmds_dir
+            self._pack_dirs[pack] = pack_dir
 
-    def _add_cmd(self, pack, name, cmd):
-        assert os.path.isfile(cmd)
+    def _add_cmd(self, pack, cmd, path):
+        assert os.path.isfile(path)
         self.pack_keys.add(pack)
-        cmds = self.pack_cmds.setdefault(pack, {})
-        cmds[name] = cmd
+        cmd_paths = self.pack_cmds.setdefault(pack, {})
+        cmd_paths[cmd] = path
 
-    def _load_cmd(self, pack, name, cmd_ref):
-        if isOttoCmd(cmd_ref):
-            return cmd_ref
+    def _load_cmd(self, pack, cmd, cmd_path):
+        if isOttoCmd(cmd_path):
+            return cmd_path
+
         try:
             cmd_module = imp.load_source(
-                    name,
-                    cmd_ref
+                    cmd,
+                    cmd_path
                     )
-            cmd_class = getattr(cmd_module, name.capitalize(), None)
+            cmd_class = getattr(cmd_module, cmd.capitalize(), None)
             if cmd_class is None:
-                print name, "could not be loaded from", cmd_ref
+                print cmd, "could not be loaded from", cmd_path
             else:
                 return cmd_class
         except SyntaxError as e:
@@ -83,9 +84,9 @@ class CmdStore(object):
         else:
             self._print(pack)
 
-    def _run(self, pack, name, *args, **kwargs):
-        cmd = self.pack_cmds[pack][name]
-        ottocmd = self._load_cmd(pack, name, cmd)(self) # Import & __init__
+    def _run(self, pack, cmd, *args, **kwargs):
+        cmd_path = self.pack_cmds[pack][cmd]
+        ottocmd = self._load_cmd(pack, cmd, cmd_path)(self) # Import & __init__
         ottocmd.run(*args, **kwargs)
 
     def run(self, name, *args, **kwargs):
@@ -108,7 +109,7 @@ class CmdStore(object):
             if cmd in self.pack_cmds[key]:
                 return key
 
-        # default to base cmds if able
+        # Default to base cmds if able
         if cmd in self.pack_cmds['base']:
             return 'base'
 
@@ -127,27 +128,28 @@ class CmdStore(object):
     def docs(self, name):
         pack, cmd = self.lookup(name)
         docs = self.pack_cmds[pack][cmd].__doc__
+
         if docs is None:
             print "%s:%s doesn't seem to have a docstring." % (pack, cmd)
         else:
-            cmd_name = "%s:%s" % (pack, cmd)
-            print cmd_name
-            print "=" * len(cmd_name)
+            title = "%s:%s" % (pack, cmd)
+            print title
+            print "=" * len(title)
             print docs
 
     def export(self):
-        return self._dirs
+        return self._pack_dirs
 
     def is_available(self, pack, cmd):
         if pack == 'base':
             return False
-        elif pack not in self.pack_cmds:
+        elif pack not in self.pack_keys:
             return True
         else:
             return cmd not in self.pack_cmds[pack]
 
     def is_used(self, pack, cmd):
-        if pack in self.pack_cmds and cmd in self.pack_cmds[pack]:
+        if pack in self.pack_keys and cmd in self.pack_cmds[pack]:
             return True
         else:
             return False
