@@ -19,14 +19,14 @@ def cmd_split(name):
 class CmdStore(object):
     def __init__(self):
         self.pack_keys = set()
-        self.cmds = {}
+        self.pack_cmds = {}
         self._dirs = {}
         self._ready = False
 
     def init(self, default_cmds=None):
         self._ready = True
         self.pack_keys = set(['base'])
-        self.cmds['base'] = default_cmds
+        self.pack_cmds['base'] = default_cmds
 
     def loadpack(self, pack, cmds_dir):
         try:
@@ -46,7 +46,7 @@ class CmdStore(object):
     def _add_cmd(self, pack, name, cmd):
         assert os.path.isfile(cmd)
         self.pack_keys.add(pack)
-        cmds = self.cmds.setdefault(pack, {})
+        cmds = self.pack_cmds.setdefault(pack, {})
         cmds[name] = cmd
 
     def _load_cmd(self, pack, name, cmd_ref):
@@ -71,7 +71,7 @@ class CmdStore(object):
     def _print(self, pack):
         if pack in self.pack_keys:
             print "* %s" % pack
-            for cmd in self.cmds[pack]:
+            for cmd in self.pack_cmds[pack]:
                 print "  - %s" % cmd
 
     def list_cmds(self, pack=None):
@@ -84,7 +84,7 @@ class CmdStore(object):
             self._print(pack)
 
     def _run(self, pack, name, *args, **kwargs):
-        cmd = self.cmds[pack][name]
+        cmd = self.pack_cmds[pack][name]
         ottocmd = self._load_cmd(pack, name, cmd)(self) # Import & __init__
         ottocmd.run(*args, **kwargs)
 
@@ -99,17 +99,17 @@ class CmdStore(object):
     def find_pack(self, cmd):
         """Given a cmd, determine which pack it belongs to."""
         # Local cmds take presidence
-        if 'local' in self.cmds:
-            if cmd in self.cmds['local']:
+        if 'local' in self.pack_cmds:
+            if cmd in self.pack_cmds['local']:
                 return 'local'
 
         # Then check installed cmds
         for key in self.installed_packs():
-            if cmd in self.cmds[key]:
+            if cmd in self.pack_cmds[key]:
                 return key
 
         # default to base cmds if able
-        if cmd in self.cmds['base']:
+        if cmd in self.pack_cmds['base']:
             return 'base'
 
     def lookup(self, name):
@@ -126,7 +126,7 @@ class CmdStore(object):
 
     def docs(self, name):
         pack, cmd = self.lookup(name)
-        docs = self.cmds[pack][cmd].__doc__
+        docs = self.pack_cmds[pack][cmd].__doc__
         if docs is None:
             print "%s:%s doesn't seem to have a docstring." % (pack, cmd)
         else:
@@ -141,13 +141,13 @@ class CmdStore(object):
     def is_available(self, pack, cmd):
         if pack == 'base':
             return False
-        elif pack not in self.cmds:
+        elif pack not in self.pack_cmds:
             return True
         else:
-            return cmd not in self.cmds[pack]
+            return cmd not in self.pack_cmds[pack]
 
     def is_used(self, pack, cmd):
-        if pack in self.cmds and cmd in self.cmds[pack]:
+        if pack in self.pack_cmds and cmd in self.pack_cmds[pack]:
             return True
         else:
             return False
