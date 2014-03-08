@@ -37,6 +37,13 @@ class TestCmdStore(unittest.TestCase):
     def test_init(self):
         self.check_store(DEFAULT_MAP)
 
+    def test_add_cmd(self):
+        with TF() as _file:
+            self.target._add_cmd('a', 'b', _file.name)
+            self.assertTrue('a' in self.target.pack_keys)
+            self.assertTrue('b' in self.target.pack_cmds['a'])
+            self.assertEqual(self.target.pack_cmds['a']['b'], _file.name)
+
     def test_loadpack(self):
         self.target.loadpack(PACK_NAME, PACK_DIR)
 
