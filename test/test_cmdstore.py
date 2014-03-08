@@ -1,11 +1,11 @@
 import unittest
 from otto.config import CmdStore
-from otto.cmds import DEFAULT_CMDS
+from otto.cmds import BASE_CMDS
 from os.path import dirname, join
 
 TEST_DIR = dirname(__file__)
 DEFAULT_MAP = map = {
-        'base': DEFAULT_CMDS.keys(),
+        'base': BASE_CMDS.keys(),
         }
 
 PACK_NAME = 'test'
@@ -20,7 +20,7 @@ PACK_MAP = {
 class TestCmdStore(unittest.TestCase):
     def setUp(self):
         self.target = CmdStore()
-        self.target.init(DEFAULT_CMDS)
+        self.target.init(BASE_CMDS)
 
     def tearDown(self):
         del self.target

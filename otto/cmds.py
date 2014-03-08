@@ -218,4 +218,4 @@ To pause for 5 seconds:
                     disp(t)
                     sleep(1)
 
-DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
+BASE_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
