@@ -1,7 +1,10 @@
 import unittest
+
+from os.path import dirname, join
+from tempfile import NamedTemporaryFile as TF
+
 from otto.config import CmdStore
 from otto.cmds import BASE_CMDS
-from os.path import dirname, join
 
 TEST_DIR = dirname(__file__)
 DEFAULT_MAP = map = {
@@ -27,9 +30,9 @@ class TestCmdStore(unittest.TestCase):
 
     def check_store(self, map):
         self.assertTrue(self.target._ready)
-        self.assertEqual(self.target.packs, set(map.keys()))
+        self.assertEqual(self.target.pack_keys, set(map.keys()))
         for pack, cmds in map.iteritems():
-            self.assertEqual(self.target.cmds[pack].keys(), cmds)
+            self.assertEqual(self.target.pack_cmds[pack].keys(), cmds)
 
     def test_init(self):
         self.check_store(DEFAULT_MAP)

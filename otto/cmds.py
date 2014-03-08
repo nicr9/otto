@@ -96,7 +96,7 @@ To edit packaged cmds, specify the pack like this:
             if pack == 'base':
                 info("Sorry, you can't edit base cmds like %s" % name)
             else:
-                cmd_path = self._store.cmds[pack][name]
+                cmd_path = self._store.pack_cmds[pack][name]
                 edit_file(cmd_path)
 
 class Remember(OttoCmd):
