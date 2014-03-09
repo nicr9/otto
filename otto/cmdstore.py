@@ -50,9 +50,11 @@ class CmdStore(object):
         cmd_paths[cmd] = path
 
     def _load_cmd(self, pack, cmd, cmd_path):
+        # Base cmds are already loaded
         if isOttoCmd(cmd_path):
             return cmd_path
 
+        # Otherwise, import and return OttoCmd subclass
         try:
             cmd_module = imp.load_source(
                     cmd,
