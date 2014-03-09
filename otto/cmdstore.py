@@ -40,18 +40,30 @@ class CmdStore(object):
         cmds = self.cmds_by_pack.setdefault(pack_name, {})
         cmds[cmd_name] = cmd_path
 
-    def _load_cmd(self, pack_name, cmd_name, cmd_path):
-        if isOttoCmd(cmd_path):
-            return cmd_path
+    def _load_cmd(self, pack_name, cmd_name, cmd_ref):
+        """Because some cmds are stored in the cache as either a class or as a
+        path to the .py file, this method is needed to disambiguate.
 
+        Given the following arguments:
+            pack_name: The pack a cmd belongs to.
+            cmd_name: The name of the cmd.
+            cmd_ref: Either the OttoCmd object or the path to it's file.
+
+        This method will always return the corresponding OttoCmd class."""
+
+        # Base cmds are already loaded
+        if isOttoCmd(cmd_ref):
+            return cmd_ref
+
+        # Otherwise, import and return OttoCmd subclass
         try:
             cmd_module = imp.load_source(
                     cmd_name,
-                    cmd_path
+                    cmd_ref
                     )
             cmd_class = getattr(cmd_module, cmd_name.capitalize(), None)
-            if cmd_class is None:
-                print cmd_name, "could not be loaded from", cmd_path
+            if not isOttoCmd(cmd_class):
+                print cmd_name, "could not be loaded from", cmd_ref
             else:
                 return cmd_class
 
