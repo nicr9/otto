@@ -23,13 +23,12 @@ PACK_MAP = {
 class TestCmdStore(unittest.TestCase):
     def setUp(self):
         self.target = CmdStore()
-        self.target.init(BASE_CMDS)
+        self.target.init_base(BASE_CMDS)
 
     def tearDown(self):
         del self.target
 
     def check_store(self, map):
-        self.assertTrue(self.target._ready)
         self.assertEqual(self.target.pack_keys, set(map.keys()))
         for pack, cmds in map.iteritems():
             self.assertEqual(self.target.pack_cmds[pack].keys(), cmds)

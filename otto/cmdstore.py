@@ -1,3 +1,12 @@
+"""The following terms are used throughout this file, I thought their use as variable names should be clarified and standardised:
+* cmd - the name of an executable cmd.
+* pack - the name of a collection of cmds.
+* name - Ambiguous, either the name of a cmd or a pack:cmd pair (use cmd_split())
+* ottocmd - cmd object.
+* cmd_ref - either the path to a file containing code for a cmd, or the cmd object itself.
+* pack_keys - a set of pack names.
+* pack_cmds - {pack : {cmd: cmd_ref}}
+"""
 import os.path
 import imp
 from otto import LOCAL_CMDS_DIR
@@ -17,14 +26,14 @@ def cmd_split(name):
         return None, name
 
 class CmdStore(object):
+    """The CmdStore is a record of all cmds currently available to the user."""
     def __init__(self):
         self.pack_keys = set()
         self.pack_cmds = {}
         self._pack_dirs = {}
-        self._ready = False
 
-    def init(self, default_cmds=None):
-        self._ready = True
+    def init_base(self, default_cmds=None):
+        """Loads the base cmds."""
         self.pack_keys = set(['base'])
         self.pack_cmds['base'] = default_cmds
 
@@ -46,23 +55,23 @@ class CmdStore(object):
     def _add_cmd(self, pack, cmd, path):
         assert os.path.isfile(path)
         self.pack_keys.add(pack)
-        cmd_paths = self.pack_cmds.setdefault(pack, {})
-        cmd_paths[cmd] = path
+        cmd_refs = self.pack_cmds.setdefault(pack, {})
+        cmd_refs[cmd] = path
 
-    def _load_cmd(self, pack, cmd, cmd_path):
+    def _load_cmd(self, pack, cmd, cmd_ref):
         # Base cmds are already loaded
-        if isOttoCmd(cmd_path):
-            return cmd_path
+        if isOttoCmd(cmd_ref):
+            return cmd_ref
 
         # Otherwise, import and return OttoCmd subclass
         try:
             cmd_module = imp.load_source(
                     cmd,
-                    cmd_path
+                    cmd_ref
                     )
             cmd_class = getattr(cmd_module, cmd.capitalize(), None)
             if cmd_class is None:
-                print cmd, "could not be loaded from", cmd_path
+                print cmd, "could not be loaded from", cmd_ref
             else:
                 return cmd_class
         except SyntaxError as e:
@@ -87,8 +96,8 @@ class CmdStore(object):
             self._print(pack)
 
     def _run(self, pack, cmd, *args, **kwargs):
-        cmd_path = self.pack_cmds[pack][cmd]
-        ottocmd = self._load_cmd(pack, cmd, cmd_path)(self) # Import & __init__
+        cmd_ref = self.pack_cmds[pack][cmd]
+        ottocmd = self._load_cmd(pack, cmd, cmd_ref)(self) # Import & __init__
         ottocmd.run(*args, **kwargs)
 
     def run(self, name, *args, **kwargs):
