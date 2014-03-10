@@ -5,6 +5,7 @@ from lament import ConfigFile
 
 from otto import *
 from otto.utils import *
+from otto.cmdstore import cmd_split
 from otto.config import CmdsConfig
 
 class New(OttoCmd):
@@ -55,18 +56,14 @@ class %s(otto.OttoCmd):
         # Allow user to implement new cmd
         edit_file(cmd_path)
 
-    def _split(self, name):
-        cmd_split = name.split(':')
-        if len(cmd_split) >= 2:
-            return cmd_split[:2]
-        else:
-            return 'local', name
-
     def run(self, *args):
         if not args:
             self.cmd_usage(['new_cmd_name', '[cmd_arg_1 ...]'])
         else:
-            pack, cmd = self._split(args[0])
+            pack, cmd = cmd_split(args[0])
+            if pack is None:
+                pack = 'local'
+
             cmd_args = args[1:]
 
             if not self._store.is_available(pack, cmd):
