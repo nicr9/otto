@@ -31,13 +31,7 @@ class %s(otto.OttoCmd):
         cmd_path = os.path.join(cmd_dir, file_name)
         cmds_file = os.path.join(cmd_dir, 'cmds.json')
 
-        # Create dir structure
-        ensure_dir(cmd_dir)
-
-        # Config
-        with ConfigFile(pack_config, True) as config:
-            packs = config.setdefault('packs', {})
-            packs[pack_name] = cmd_dir
+        touch_pack(pack_name)
 
         with ConfigFile(cmds_file, True) as local_cmds:
             cmds = local_cmds.setdefault('cmds', {})

@@ -24,10 +24,20 @@ def update_packs(src_dir, new_packs):
         packs = config.setdefault('packs', {})
         packs.update(new_packs)
 
+def pack_root(pack):
+    return LOCAL_DIR if pack == 'local' else GLOBAL_DIR
+
 def pack_path(pack):
     """Determine a pack's directory."""
-    root = LOCAL_DIR if pack == LOCAL_DIR else GLOBAL_DIR
-    return os.path.join(root, pack)
+    return os.path.join(pack_root(pack), pack)
+
+def touch_pack(pack):
+    dest = pack_path(pack)
+    ensure_dir(dest)
+
+    with ConfigFile(os.path.join(pack_root(pack), 'config.json'), True) as config:
+        packs = config.setdefault('packs', {})
+        packs[pack] = dest
 
 def fix_cmds(dest):
     with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
