@@ -24,6 +24,11 @@ def update_packs(src_dir, new_packs):
         packs = config.setdefault('packs', {})
         packs.update(new_packs)
 
+def pack_path(pack):
+    """Determine a pack's directory."""
+    root = LOCAL_DIR if pack == LOCAL_DIR else GLOBAL_DIR
+    return os.path.join(root, pack)
+
 def fix_cmds(dest):
     with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
         cmds = config.setdefault('cmds', {})
