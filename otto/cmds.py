@@ -199,7 +199,7 @@ If the .opack contains multiple packs, it will ask you to choose which to instal
 
 class Uninstall(OttoCmd):
     """Remove installed packages. This cmd takes no arguments and will guide you through the process interactively."""
-    def run(self):
+    def run(self, *args):
         from shutil import rmtree
         # Get list of installed packages
         installed_packs = get_packs(GLOBAL_DIR)
