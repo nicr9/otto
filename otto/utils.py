@@ -12,7 +12,7 @@ from shutil import copytree, rmtree
 from otto import *
 
 def bail(msg=None):
-    info("Exiting: %s" % msg if msg else "Exiting...")
+    info("\nExiting: %s" % msg if msg else "\nExiting...")
     sys.exit()
 
 def get_packs(src_dir):

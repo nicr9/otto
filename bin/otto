@@ -9,6 +9,7 @@ from subprocess import call as shcall
 import shutil
 
 from otto import *
+from otto.utils import bail
 from otto.cmds import DEFAULT_CMDS
 from otto.config import OttoConfig
 
@@ -43,7 +44,10 @@ class OttoDispatcher(object):
     def handle(self, cmd, args):
         if not args:
             args = self.config.remember.get(cmd, [])
-        self.config.packs.run(cmd, *args)
+        try:
+            self.config.packs.run(cmd, *args)
+        except KeyboardInterrupt:
+            bail()
 
         self.tone()
 
