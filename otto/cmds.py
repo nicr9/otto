@@ -34,8 +34,7 @@ class %s(otto.OttoCmd):
         touch_pack(pack_name)
 
         with ConfigFile(cmds_file, True) as local_cmds:
-            cmds = local_cmds.setdefault('cmds', {})
-            cmds[cmd_name] = cmd_path
+            local_cmds['cmds'][cmd_name] = cmd_path
 
         # Create template for cmd
         with open(cmd_path, 'w') as cmd_file:

@@ -32,12 +32,18 @@ def pack_path(pack):
     return os.path.join(pack_root(pack), pack)
 
 def touch_pack(pack):
+    """Make sure the pack directory exists, create config files as needed."""
     dest = pack_path(pack)
     ensure_dir(dest)
 
-    with ConfigFile(os.path.join(pack_root(pack), 'config.json'), True) as config:
+    root_config = os.path.join(pack_root(pack), 'config.json')
+    with ConfigFile(root_config, True) as config:
         packs = config.setdefault('packs', {})
         packs[pack] = dest
+
+    cmds_config = os.path.join(pack_path(pack), 'cmds.json')
+    with ConfigFile(cmds_file, True) as local_cmds:
+        cmds = local_cmds.setdefault('cmds', {})
 
 def fix_cmds(dest):
     with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
