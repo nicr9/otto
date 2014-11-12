@@ -110,6 +110,7 @@ def cmd_split(name, default_pack=None):
 ### Manipulate cmds
 
 def fix_cmds(dest):
+    """Change cmd.json cmds values from file names to absolute paths."""
     with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
         cmds = config.setdefault('cmds', {})
         for key in cmds:
@@ -141,6 +142,7 @@ def move_cmd(src, dest):
     return src_pack_empty
 
 def clone_all(src, dest): # TODO: Test this
+    """Clone a dir containing multiple packs to a different location."""
     ensure_dir(dest)
 
     # Add pack to dest config
@@ -157,7 +159,7 @@ def clone_all(src, dest): # TODO: Test this
     update_packs(dest, src_packs)
 
 class OttoCmd(object):
-    """Base class for all `otto` commands"""
+    """Base class for all `otto` commands."""
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, store):
@@ -169,11 +171,11 @@ class OttoCmd(object):
 
     @abc.abstractmethod
     def run(*args, **kwargs):
-        """Otto command handler"""
+        """Otto command handler."""
         return
 
     def cmd_usage(self, args):
-        """Print useage for this command and exit"""
+        """Print useage for this command and exit."""
         print "Usage:\n  $ otto %s %s" % (self._name(), ' '.join(args))
         sys.exit()
 
