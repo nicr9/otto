@@ -95,6 +95,18 @@ def rm_pack(path, name):
     # Delete pack dir
     rmtree(os.path.join(GLOBAL_DIR, name))
 
+### Cmd Info
+
+def cmd_split(name, default_pack=None):
+    """Given the name of a cmd, split it into (pack, cmd).
+
+    A default pack can be specified if the name cannot be split."""
+    cmd_split = name.split(':')
+    if len(cmd_split) >= 2:
+        return cmd_split[:2]
+    else:
+        return default_pack, name
+
 ### Manipulate cmds
 
 def fix_cmds(dest):
