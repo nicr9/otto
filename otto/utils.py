@@ -15,14 +15,7 @@ def bail(msg=None):
     info("\nExiting: %s" % msg if msg else "\nExiting...")
     sys.exit()
 
-def get_packs(src_dir):
-    with ConfigFile(os.path.join(src_dir, 'config.json')) as config:
-        return config.get('packs', {})
-
-def update_packs(src_dir, new_packs):
-    with ConfigFile(os.path.join(src_dir, 'config.json'), True) as config:
-        packs = config.setdefault('packs', {})
-        packs.update(new_packs)
+### Pack Info
 
 def pack_root(pack):
     return LOCAL_DIR if pack == 'local' else GLOBAL_DIR
@@ -30,6 +23,12 @@ def pack_root(pack):
 def pack_path(pack):
     """Determine a pack's directory."""
     return os.path.join(pack_root(pack), pack)
+
+def get_packs(src_dir):
+    with ConfigFile(os.path.join(src_dir, 'config.json')) as config:
+        return config.get('packs', {})
+
+### Manipulate Packs
 
 def touch_pack(pack):
     """Make sure the pack directory exists, create config files as needed."""
@@ -45,12 +44,10 @@ def touch_pack(pack):
     with ConfigFile(cmds_file, True) as local_cmds:
         cmds = local_cmds.setdefault('cmds', {})
 
-def fix_cmds(dest):
-    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
-        cmds = config.setdefault('cmds', {})
-        for key in cmds:
-            rel_path = os.path.join(dest, "%s.py" % key)
-            cmds[key] = os.path.abspath(rel_path)
+def update_packs(src_dir, new_packs):
+    with ConfigFile(os.path.join(src_dir, 'config.json'), True) as config:
+        packs = config.setdefault('packs', {})
+        packs.update(new_packs)
 
 def move_pack(src_path, src_pack, dest_pack):
     dest = os.path.join(src_path, dest_pack)
@@ -89,6 +86,48 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack=None):
     # change cmd paths
     fix_cmds(dest)
 
+def rm_pack(path, name):
+    # Remove pack from config
+    with ConfigFile(os.path.join(path, 'config.json')) as config:
+        packs = config.get('packs', {})
+        packs.pop(name, None)
+
+    # Delete pack dir
+    rmtree(os.path.join(GLOBAL_DIR, name))
+
+### Manipulate cmds
+
+def fix_cmds(dest):
+    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
+        cmds = config.setdefault('cmds', {})
+        for key in cmds:
+            rel_path = os.path.join(dest, "%s.py" % key)
+            cmds[key] = os.path.abspath(rel_path)
+
+def move_cmd(src, dest):
+    """Move a cmd from one pack to an other."""
+    src_pack, src_cmd = cmd_split(src)
+    src_path = pack_path(src_pack)
+    dest_pack, dest_cmd = cmd_split(dest)
+    dest_path = pack_path(dest_pack)
+
+    # Update old config
+    src_pack_empty = False
+    with ConfigFile(os.path.join(src_path, 'cmds.json')) as config:
+        py_path = config['cmds'].pop(src_cmd, None)
+
+        if not config['cmds']:
+            src_pack_empty = True
+
+    # Touch dest_pack
+    touch_pack(dest_pack)
+
+    # Move .py
+
+    # Update new config
+
+    return src_pack_empty
+
 def clone_all(src, dest): # TODO: Test this
     ensure_dir(dest)
 
@@ -104,15 +143,6 @@ def clone_all(src, dest): # TODO: Test this
                     )
 
     update_packs(dest, src_packs)
-
-def rm_pack(path, name):
-    # Remove pack from config
-    with ConfigFile(os.path.join(path, 'config.json')) as config:
-        packs = config.get('packs', {})
-        packs.pop(name, None)
-
-    # Delete pack dir
-    rmtree(os.path.join(GLOBAL_DIR, name))
 
 class OttoCmd(object):
     """Base class for all `otto` commands"""
