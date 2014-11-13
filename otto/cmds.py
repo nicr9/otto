@@ -195,7 +195,7 @@ class Uninstall(OttoCmd):
         dialog.choose(installed_packs.keys())
         info('Uninstalling %s...' % dialog.result)
 
-        rm_pack(GLOBAL_DIR, dialog.result)
+        rm_pack(dialog.result)
 
 class Wait(OttoCmd):
     """A simple timer.
