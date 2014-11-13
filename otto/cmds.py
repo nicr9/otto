@@ -120,7 +120,7 @@ You can bind as many arguments as you want separated by spaces. To bind values t
 
 class Pack(OttoCmd):
     """Turn all local cmds into a package to be distributed/installed.
-    
+
 The resulting .opack file and the pack it contains will get their name from the argument you provide:
   $ otto pack pack_name
 """
@@ -145,7 +145,7 @@ The resulting .opack file and the pack it contains will get their name from the 
 
 class Install(OttoCmd):
     """Install any pack from a .opack.
-    
+
 You specify the .opack like so:
   $ otto install my_pack.opack
 
@@ -154,7 +154,7 @@ If the .opack contains multiple packs, it will ask you to choose which to instal
 
     def run(self, pack_path):
         from shutil import copytree, rmtree
-        install_temp = os.path.join(GLOBAL_DIR, '_installing') 
+        install_temp = os.path.join(GLOBAL_DIR, '_installing')
 
         ensure_dir(install_temp)
 

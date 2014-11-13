@@ -41,7 +41,7 @@ def touch_pack(pack):
         packs[pack] = dest
 
     cmds_config = os.path.join(pack_path(pack), 'cmds.json')
-    with ConfigFile(cmds_file, True) as local_cmds:
+    with ConfigFile(cmds_config, True) as local_cmds:
         cmds = local_cmds.setdefault('cmds', {})
 
 def update_packs(src_dir, new_packs):
@@ -144,8 +144,8 @@ def move_cmd(src, dest):
         py_path = os.path.join(src_path, "%s.py" % src_cmd)
 
     # Make sure src file exists
-    if not os.isfile(py_path):
-        bail.("Couldn't find %s.py" src_cmd)
+    if not os.path.isfile(py_path):
+        bail("Couldn't find %s.py" % src_cmd)
 
     # Touch dest_pack
     touch_pack(dest_pack)
