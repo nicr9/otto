@@ -7,7 +7,7 @@ import subprocess
 
 from getpass import getpass
 from lament import ConfigFile
-from shutil import copytree, rmtree
+from shutil import copyfile, copytree, rmtree
 
 from otto import *
 
@@ -126,18 +126,31 @@ def move_cmd(src, dest):
 
     # Update old config
     src_pack_empty = False
+    py_path = None
     with ConfigFile(os.path.join(src_path, 'cmds.json')) as config:
         py_path = config['cmds'].pop(src_cmd, None)
 
         if not config['cmds']:
             src_pack_empty = True
 
+    # If cmds.json was corrupt, figure out src file path
+    if not py_path:
+        py_path = os.path.join(src_path, "%s.py" % src_cmd)
+
+    # Make sure src file exists
+    if not os.isfile(py_path):
+        bail.("Couldn't find %s.py" src_cmd)
+
     # Touch dest_pack
     touch_pack(dest_pack)
 
     # Move .py
+    copyfile(py_path, os.path.join(dest_path, "%s.py" % dest_cmd))
 
     # Update new config
+    with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
+        config['cmds'][dest_cmd] = ''
+    fix_cmds(dest_pack)
 
     return src_pack_empty
 
