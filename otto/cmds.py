@@ -93,6 +93,21 @@ To edit packaged cmds, specify the pack like this:
                 cmd_path = self._store.cmds[pack][name]
                 edit_file(cmd_path)
 
+class Mv(OttoCmd):
+    """Move a cmd from one pack to an other."""
+    def run(self, src, dest):
+        src_pack, _ = cmd_split(src, 'local')
+        src_root = pack_root(src_pack)
+
+        info("Moving...")
+        src_empty = move_cmd(src, dest)
+        if src_empty:
+            info("Source pack is now empty, deleting it...")
+            rm_pack(src_root, src_pack)
+            del_pack(src_root, src_pack)
+
+        info("Done!")
+
 class Remember(OttoCmd):
     """Binds a list of arguments to a cmd.
 
