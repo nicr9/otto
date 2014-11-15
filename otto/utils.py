@@ -129,7 +129,7 @@ def move_cmd(src, dest):
     """Move a cmd from one pack to an other."""
     src_pack, src_cmd = cmd_split(src, default_pack='local')
     src_path = pack_path(src_pack)
-    dest_pack, dest_cmd = cmd_split(dest)
+    dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
     dest_path = pack_path(dest_pack)
 
     # Update old config
