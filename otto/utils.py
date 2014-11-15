@@ -127,7 +127,7 @@ def fix_cmds(dest):
 
 def move_cmd(src, dest):
     """Move a cmd from one pack to an other."""
-    src_pack, src_cmd = cmd_split(src)
+    src_pack, src_cmd = cmd_split(src, default_pack='local')
     src_path = pack_path(src_pack)
     dest_pack, dest_cmd = cmd_split(dest)
     dest_path = pack_path(dest_pack)
@@ -155,10 +155,13 @@ def move_cmd(src, dest):
     # Move .py
     copyfile(py_path, os.path.join(dest_path, "%s.py" % dest_cmd))
 
+    # Remove compiled file (*.pyc)
+    os.remove(os.path.join(dest_path, "%s.pyc" % dest_cmd))
+
     # Update new config
     with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
         config['cmds'][dest_cmd] = ''
-    fix_cmds(dest_pack)
+    fix_cmds(dest_path)
 
     return src_pack_empty
 
