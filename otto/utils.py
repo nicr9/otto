@@ -86,16 +86,18 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack=None):
     # change cmd paths
     fix_cmds(dest)
 
-def rm_pack(pack):
-    """Delete the pack folder and clear the entry from config.json."""
-    parent_path = LOCAL_DIR if pack == 'local' else GLOBAL_DIR
+def rm_pack(parent_path, pack):
+    """Clear any entries relating to a pack from it's parent's config.json."""
     config_path = os.path.join(parent_path, 'config.json')
-    target_path = pack_path(pack)
 
     # Remove pack from config
     with ConfigFile(config_path) as config:
         packs = config.get('packs', {})
         packs.pop(pack, None)
+
+def del_pack(parent_path, pack):
+    """Delete the folder associated with a pack."""
+    target_path = pack_path(pack)
 
     # Delete pack dir
     if os.path.isdir(target_path):
