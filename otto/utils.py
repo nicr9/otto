@@ -363,7 +363,8 @@ class Dialog(object):
         self._validate()
 
         try:
-            self.result = getpass("%s : " % self.header)
+            prompt = bold_format("%s : " % self.header)
+            self.result = getpass(prompt)
         except KeyboardInterrupt:
             bail()
 
