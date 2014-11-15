@@ -112,8 +112,13 @@ class CmdStore(object):
             bail("Couldn't lookup '%s'" % name)
 
     def docs(self, name):
+        # Find OttoCmd class
         pack, cmd = self.lookup(name)
-        docs = self.cmds[pack][cmd].__doc__
+        ottocmd = self.cmds[pack][cmd]
+        if isinstance(ottocmd, unicode):
+            ottocmd = self._load_cmd(pack, cmd, ottocmd)
+
+        docs = ottocmd.__doc__
         if docs is None:
             print "%s:%s doesn't seem to have a docstring." % (pack, cmd)
         else:
