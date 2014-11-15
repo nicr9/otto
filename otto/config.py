@@ -123,9 +123,11 @@ class CmdStore(object):
             print "%s:%s doesn't seem to have a docstring." % (pack, cmd)
         else:
             cmd_name = "%s:%s" % (pack, cmd)
+            doc_lines = [line.lstrip(' ') for line in docs.split('\n')]
+
             print cmd_name
             print "=" * len(cmd_name)
-            print docs
+            print '\n'.join(doc_lines)
 
     def export(self):
         return self._dirs

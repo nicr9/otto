@@ -10,13 +10,13 @@ from otto.config import CmdsConfig
 class New(OttoCmd):
     """Used to create new cmds.
 
-To create a new local cmd "new_cmd" with the argument "arg" you would run the following:
-  $ otto new new_cmd arg
+    To create a new local cmd "new_cmd" with the argument "arg" you would run the following:
+	$ otto new new_cmd arg
 
-This will create the folder .otto/ along with the necessary config files and open vim with the boilerplate code ready for you to work on.
+    This will create the folder .otto/ along with the necessary config files and open vim with the boilerplate code ready for you to work on.
 
-If you would prefer to create a the new cmd in a pack, you can specify the pack like this:
-  $ otto new pack_name:new_cmd
+    If you would prefer to create a the new cmd in a pack, you can specify the pack like this:
+	$ otto new pack_name:new_cmd
 """
 
     cmd_template = """import otto.utils as otto
@@ -75,11 +75,11 @@ class %s(otto.OttoCmd):
 class Edit(OttoCmd):
     """Edit local or packaged cmds.
 
-If you want to edit a local cmd called "cmd_name":
-  $ otto edit cmd_name
+    If you want to edit a local cmd called "cmd_name":
+	$ otto edit cmd_name
 
-To edit packaged cmds, specify the pack like this:
-  $ otto edit pack_name:cmd_name
+    To edit packaged cmds, specify the pack like this:
+	$ otto edit pack_name:cmd_name
 """
 
     def run(self, *args):
@@ -111,11 +111,11 @@ class Mv(OttoCmd):
 class Remember(OttoCmd):
     """Binds a list of arguments to a cmd.
 
-For example, if you wanted to always pass the value "5" to the "cmd_name" cmd:
-  $ otto remember cmd_name 5
+    For example, if you wanted to always pass the value "5" to the "cmd_name" cmd:
+	$ otto remember cmd_name 5
 
-You can bind as many arguments as you want separated by spaces. To bind values that contain spaces, you can wrap them in quotes like this:
-  $ otto remember cmd_name "The cake is a lie"
+    You can bind as many arguments as you want separated by spaces. To bind values that contain spaces, you can wrap them in quotes like this:
+	$ otto remember cmd_name "The cake is a lie"
 """
 
     def run(self, *args):
@@ -136,8 +136,8 @@ You can bind as many arguments as you want separated by spaces. To bind values t
 class Pack(OttoCmd):
     """Turn all local cmds into a package to be distributed/installed.
 
-The resulting .opack file and the pack it contains will get their name from the argument you provide:
-  $ otto pack pack_name
+    The resulting .opack file and the pack it contains will get their name from the argument you provide:
+	$ otto pack pack_name
 """
 
     def run(self, pack_name):
@@ -161,10 +161,10 @@ The resulting .opack file and the pack it contains will get their name from the 
 class Install(OttoCmd):
     """Install any pack from a .opack.
 
-You specify the .opack like so:
-  $ otto install my_pack.opack
+    You specify the .opack like so:
+	$ otto install my_pack.opack
 
-If the .opack contains multiple packs, it will ask you to choose which to install.
+    If the .opack contains multiple packs, it will ask you to choose which to install.
 """
 
     def run(self, pack_path):
@@ -199,7 +199,9 @@ If the .opack contains multiple packs, it will ask you to choose which to instal
         rmtree(install_temp)
 
 class Uninstall(OttoCmd):
-    """Remove installed packages. This cmd takes no arguments and will guide you through the process interactively."""
+    """Remove installed packages.
+
+    This cmd takes no arguments and will guide you through the process interactively."""
     def run(self, *args):
         from shutil import rmtree
         # Get list of installed packages
@@ -217,8 +219,8 @@ class Uninstall(OttoCmd):
 class Wait(OttoCmd):
     """A simple timer.
 
-To pause for 5 seconds:
-  $ otto wait 5
+    To pause for 5 seconds:
+	$ otto wait 5
 """
     def run(self, secs):
         from time import sleep
