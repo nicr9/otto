@@ -12,3 +12,4 @@ LOCAL_CMDS_DIR = os.path.join(LOCAL_DIR, 'local')
 
 # Other constants
 PACK_EXT = '.opack'
+OTTO_VERSION = 'v0.5'

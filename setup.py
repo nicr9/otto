@@ -1,8 +1,9 @@
 from distutils.core import setup
+from otto import OTTO_VERSION
 
 setup(
     name='otto',
-    version='v0.5',
+    version=OTTO_VERSION,
     author='Nic Roland',
     author_email='nicroland9@gmail.com',
     packages=['otto'],

@@ -68,16 +68,53 @@ def bootstrap(cmd, args, opts):
         otto.list_cmds()
     elif opts['cmd_docs']:
         otto.print_docs(cmd)
+    elif opts['print_version']:
+        print OTTO_VERSION
     else:
         otto.handle(cmd, args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=OTTO_DESC)
 
-    parser.add_argument('-l', action='store_true', help="List available commands", dest='list_cmds')
-    parser.add_argument('-d', action='store_true', help="print out the docstring for the specified command", dest='cmd_docs')
-    parser.add_argument(action='store', nargs='?', default='', type=str, help="Workflow to run", metavar='command', dest='cmd')
-    parser.add_argument(action='store', nargs='*', type=str, help="Arguments for command", metavar='ARG', dest='args')
+    parser.add_argument(
+            '-l',
+            action='store_true',
+            help="List available commands",
+            dest='list_cmds'
+            )
+
+    parser.add_argument(
+            '-d',
+            action='store_true',
+            help="Print out the docstring for the specified command",
+            dest='cmd_docs'
+            )
+
+    parser.add_argument(
+            '-V',
+            action='store_true',
+            help="Print out version details.",
+            dest='print_version'
+            )
+
+    parser.add_argument(
+            action='store',
+            nargs='?',
+            default='',
+            type=str,
+            help="Workflow to run",
+            metavar='command',
+            dest='cmd'
+            )
+
+    parser.add_argument(
+            action='store',
+            nargs='*',
+            type=str,
+            help="Arguments for command",
+            metavar='ARG',
+            dest='args'
+            )
 
     namespace = parser.parse_args()
 
@@ -86,6 +123,7 @@ if __name__ == "__main__":
     opts = {
             'list_cmds': namespace.list_cmds,
             'cmd_docs': namespace.cmd_docs,
+            'print_version': namespace.print_version,
             }
 
     bootstrap(cmd, args, opts)
