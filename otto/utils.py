@@ -155,13 +155,16 @@ def move_cmd(src, dest):
     # Move .py
     copyfile(py_path, os.path.join(dest_path, "%s.py" % dest_cmd))
 
-    # Remove compiled file (*.pyc)
-    os.remove(os.path.join(dest_path, "%s.pyc" % dest_cmd))
-
     # Update new config
     with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
         config['cmds'][dest_cmd] = ''
     fix_cmds(dest_path)
+
+    # Remove compiled file (*.pyc)
+    try:
+        os.remove(os.path.join(dest_path, "%s.pyc" % dest_cmd))
+    except OSError:
+        pass
 
     return src_pack_empty
 
