@@ -132,6 +132,8 @@ def move_cmd(src, dest):
     dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
     dest_path = pack_path(dest_pack)
 
+    rename = src_cmd != dest_cmd
+
     # Update old config
     src_pack_empty = False
     py_path = None
@@ -153,7 +155,17 @@ def move_cmd(src, dest):
     touch_pack(dest_pack)
 
     # Move .py
-    copyfile(py_path, os.path.join(dest_path, "%s.py" % dest_cmd))
+    dest_file = os.path.join(dest_path, "%s.py" % dest_cmd)
+    copyfile(py_path, dest_file)
+
+    if rename:
+        command = r"sed -i 's/class %s(otto.OttoCmd):/class %s(otto.OttoCmd):/' %s"
+        shell(command % (
+            src_cmd.capitalize(),
+            dest_cmd.capitalize(),
+            dest_file
+            ))
+
 
     # Update new config
     with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
