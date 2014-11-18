@@ -28,6 +28,11 @@ def get_packs(src_dir):
     with ConfigFile(os.path.join(src_dir, 'config.json')) as config:
         return config.get('packs', {})
 
+def pack_empty(pack):
+    path = pack_path(pack)
+    with ConfigFile(os.path.join(path, 'cmds.json')) as config:
+        return len(config.get('cmds', {})) == 0
+
 ### Manipulate Packs
 
 def touch_pack(pack):
@@ -135,13 +140,9 @@ def move_cmd(src, dest):
     rename = src_cmd != dest_cmd
 
     # Update old config
-    src_pack_empty = False
     py_path = None
     with ConfigFile(os.path.join(src_path, 'cmds.json')) as config:
         py_path = config['cmds'].pop(src_cmd, None)
-
-        if not config['cmds']:
-            src_pack_empty = True
 
     # If cmds.json was corrupt, figure out src file path
     if not py_path:
@@ -177,8 +178,6 @@ def move_cmd(src, dest):
         os.remove(os.path.join(dest_path, "%s.pyc" % dest_cmd))
     except OSError:
         pass
-
-    return src_pack_empty
 
 def clone_all(src, dest): # TODO: Test this
     """Clone a dir containing multiple packs to a different location."""

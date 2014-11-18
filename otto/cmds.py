@@ -100,8 +100,9 @@ class Mv(OttoCmd):
         src_root = pack_root(src_pack)
 
         info("Moving...")
-        src_empty = move_cmd(src, dest)
-        if src_empty:
+        move_cmd(src, dest)
+
+        if pack_empty(src_pack):
             info("Source pack is now empty, deleting it...")
             rm_pack(src_root, src_pack)
             del_pack(src_root, src_pack)
