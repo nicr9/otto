@@ -7,7 +7,7 @@ import subprocess
 
 from getpass import getpass
 from lament import ConfigFile
-from shutil import copyfile, copytree, rmtree
+from shutil import move, copytree, rmtree
 
 from otto import *
 
@@ -157,7 +157,7 @@ def move_cmd(src, dest):
 
     # Move .py
     dest_file = os.path.join(dest_path, "%s.py" % dest_cmd)
-    copyfile(py_path, dest_file)
+    move(py_path, dest_file)
 
     if rename:
         command = r"sed -i 's/class %s(otto.OttoCmd):/class %s(otto.OttoCmd):/' %s"
@@ -167,7 +167,6 @@ def move_cmd(src, dest):
             dest_file
             ))
 
-
     # Update new config
     with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
         config['cmds'][dest_cmd] = ''
@@ -175,7 +174,7 @@ def move_cmd(src, dest):
 
     # Remove compiled file (*.pyc)
     try:
-        os.remove(os.path.join(dest_path, "%s.pyc" % dest_cmd))
+        os.remove(os.path.join(src_path, "%s.pyc" % src_cmd))
     except OSError:
         pass
 
