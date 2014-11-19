@@ -139,9 +139,14 @@ def move_cmd(src, dest):
 
     rename = src_cmd != dest_cmd
 
+    # Verify old config
+    src_cmds_json = os.path.join(src_path, 'cmds.json')
+    if not os.path.isfile(src_cmds_json):
+        bail("Can't mv %s:%s, config not found." % (src_pack, src_cmd))
+
     # Update old config
     py_path = None
-    with ConfigFile(os.path.join(src_path, 'cmds.json')) as config:
+    with ConfigFile(src_cmds_json) as config:
         py_path = config['cmds'].pop(src_cmd, None)
 
     # If cmds.json was corrupt, figure out src file path
