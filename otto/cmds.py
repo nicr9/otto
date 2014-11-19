@@ -96,14 +96,27 @@ class Edit(OttoCmd):
 class Mv(OttoCmd):
     """Move a cmd from one pack to an other."""
     def run(self, src, dest):
-        src_pack, _ = cmd_split(src, 'local')
-        src_root = pack_root(src_pack)
+        src_pack, src_cmd = cmd_split(src, default_pack='local')
+        dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
 
-        info("Moving...")
-        move_cmd(src, dest)
+        # Work out exactly what actions to do
+        moving = src_pack != dest_pack
+        renaming = src_cmd != dest_cmd
+        actions = []
+        if moving: actions.append('Moving')
+        if renaming: actions.append('Renaming')
 
+        # Perform those actions
+        if actions:
+            info("%s..." % '/'.join(actions))
+            move_cmd(src, dest)
+        else:
+            bail("Nothing to do.")
+
+        # Clean up
         if pack_empty(src_pack):
             info("Source pack is empty, deleting it...")
+            src_root = pack_root(src_pack)
             rm_pack(src_root, src_pack)
             del_pack(src_root, src_pack)
 
