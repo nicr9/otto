@@ -102,15 +102,15 @@ class Mv(OttoCmd):
         # Work out exactly what actions to do
         moving = src_pack != dest_pack
         renaming = src_cmd != dest_cmd
-        actions = []
-        if moving: actions.append('Moving')
-        if renaming: actions.append('Renaming')
 
         # Perform those actions
-        if actions:
-            info("%s..." % '/'.join(actions))
+        if moving:
+            info("Moving...")
             move_cmd(src, dest)
-        else:
+        if renaming:
+            info("Renaming...")
+            rename_ottocmd(src_cmd, dest_cmd, pack_path(dest_pack))
+        if not (moving or renaming):
             bail("Nothing to do.")
 
         # Clean up

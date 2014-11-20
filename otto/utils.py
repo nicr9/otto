@@ -108,6 +108,15 @@ def del_pack(parent_path, pack):
     if os.path.isdir(target_path):
         rmtree(target_path)
 
+def rename_ottocmd(src_cmd, dest_cmd, file_path):
+    """Edits OttoCmd name within a file."""
+    command = r"sed -i 's/class %s(otto.OttoCmd):/class %s(otto.OttoCmd):/' %s"
+    shell(command % (
+        src_cmd.capitalize(),
+        dest_cmd.capitalize(),
+        file_path
+        ))
+
 ### Cmd Info
 
 def cmd_split(name, default_pack=None):
@@ -163,14 +172,6 @@ def move_cmd(src, dest):
     # Move .py
     dest_file = os.path.join(dest_path, "%s.py" % dest_cmd)
     move(py_path, dest_file)
-
-    if rename:
-        command = r"sed -i 's/class %s(otto.OttoCmd):/class %s(otto.OttoCmd):/' %s"
-        shell(command % (
-            src_cmd.capitalize(),
-            dest_cmd.capitalize(),
-            dest_file
-            ))
 
     # Update new config
     with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
