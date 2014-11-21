@@ -11,6 +11,11 @@ from shutil import move, copytree, rmtree
 
 from otto import *
 
+def find_cmd_files(path):
+    raw = shell('grep %s -He "^class .*("' % os.path.join(path, '*.py'))
+    splits = [line.split(':')[:2] for line in raw.splitlines()]
+    return {cmd: path for path, cmd in splits}
+
 def bail(msg=None):
     info("\nExiting: %s" % msg if msg else "\nExiting...")
     sys.exit()
