@@ -245,4 +245,17 @@ class Wait(OttoCmd):
                     disp(t)
                     sleep(1)
 
+class Dr(OttoCmd):
+    """Diagnose and repair problems."""
+    def run(self):
+        info("Rebuilding local cmd directory.")
+        cmds = rebuild_cmd_config(LOCAL_CMDS_DIR)
+        if cmds:
+            info("Local cmds found:")
+            for cmd in cmds.iterkeys():
+                print " -", cmd
+
+        with ConfigFile(os.path.join(LOCAL_CMDS_DIR, 'cmds.json')) as config:
+            config['cmds'] = cmds
+
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}

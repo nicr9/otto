@@ -4,6 +4,7 @@ import os.path
 import sys
 import json
 import subprocess
+import re
 
 from getpass import getpass
 from lament import ConfigFile
@@ -11,10 +12,22 @@ from shutil import move, copytree, rmtree
 
 from otto import *
 
-def find_cmd_files(path):
-    raw = shell('grep %s -He "^class .*("' % os.path.join(path, '*.py'))
-    splits = [line.split(':')[:2] for line in raw.splitlines()]
-    return {cmd: path for path, cmd in splits}
+def rebuild_cmd_config(path):
+    def _ottocmd_name(code):
+        match = re.search("^class (.*?)\(", code)
+        if match:
+            return match.group(1).lower()
+
+    file_pattern = os.path.join(path, '*.py')
+    grep_raw = shell('grep %s -He "^class .*("' % file_pattern)
+    grep_results = [line.split(':')[:2] for line in grep_raw.splitlines()]
+    results = {_ottocmd_name(cmd): path for path, cmd in grep_results}
+
+    # Clean up any bad results found
+    if None in results:
+        del results[None]
+
+    return results
 
 def bail(msg=None):
     info("\nExiting: %s" % msg if msg else "\nExiting...")
