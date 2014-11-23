@@ -292,6 +292,10 @@ def blue(msg):
 def info(msg):
     print bold_format(msg)
 
+def bullets(messages, bullet="-"):
+    for message in messages:
+        print " {} {}".format(bullet, message)
+
 def shell(cmd, echo=True, stdout=False):
     outp = ''
     try:
