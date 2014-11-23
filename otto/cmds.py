@@ -260,6 +260,10 @@ class Dr(OttoCmd):
                 if cmds:
                     info("Pack '%s' contains:" % pack)
                     bullets(cmds.keys())
+                else:
+                    info("Pack '%s' is empty, deleting it..." % pack)
+                    rm_pack(GLOBAL_DIR, pack)
+                    del_pack(GLOBAL_DIR, pack)
 
         if restore_local:
             info("Restoring local config files...")
