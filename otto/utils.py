@@ -34,13 +34,17 @@ def rebuild_cmd_config(path):
             return match.group(1).lower()
 
     file_pattern = os.path.join(path, '*.py')
-    grep_raw = shell('grep %s -He "^class .*("' % file_pattern)
+    grep_raw = shell('grep %s -He "^class .*("' % file_pattern, echo=False)
     grep_results = [line.split(':')[:2] for line in grep_raw.splitlines()]
     results = {_ottocmd_name(cmd): path for path, cmd in grep_results}
 
     # Clean up any bad results found
     if None in results:
         del results[None]
+
+    cmds_config = os.path.join(path, 'cmds.json')
+    with ConfigFile(cmds_config) as config:
+        config['cmds'] = results
 
     return results
 
