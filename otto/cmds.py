@@ -248,7 +248,7 @@ class Wait(OttoCmd):
 class Dr(OttoCmd):
     """Diagnose and repair problems."""
     def run(self):
-        if os.path.isdir(LOCAL_DIR):
+        if os.path.isdir(LOCAL_CMDS_DIR):
             info("Restoring local config files...")
             with ConfigFile(LOCAL_CONFIG) as config:
                 config['packs'] = {'local': LOCAL_CMDS_DIR}
@@ -261,6 +261,8 @@ class Dr(OttoCmd):
             with ConfigFile(os.path.join(LOCAL_CMDS_DIR, 'cmds.json')) as config:
                 config['cmds'] = cmds
 
-        info("Done")
+            info("Done")
+        else:
+            info("Nothing to do!")
 
 DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
