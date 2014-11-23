@@ -248,19 +248,29 @@ class Wait(OttoCmd):
 class Dr(OttoCmd):
     """Diagnose and repair problems."""
     def run(self):
-        if os.path.isdir(LOCAL_CMDS_DIR):
+        restore_global = os.path.isdir(GLOBAL_DIR)
+        restore_local = os.path.isdir(LOCAL_CMDS_DIR)
+
+        if restore_global:
+            info("Restoring global config files...")
+            packs = rebuild_root_config(GLOBAL_DIR)
+
+            for pack, pack_path in packs.iteritems():
+                cmds = rebuild_cmd_config(pack_path)
+                if cmds:
+                    info("Pack '%s' contains:" % pack)
+                    bullets(cmds.keys())
+
+        if restore_local:
             info("Restoring local config files...")
-            with ConfigFile(LOCAL_CONFIG) as config:
-                config['packs'] = {'local': LOCAL_CMDS_DIR}
+            rebuild_root_config(LOCAL_DIR)
 
             cmds = rebuild_cmd_config(LOCAL_CMDS_DIR)
             if cmds:
-                info("Local cmds found:")
+                info("Local cmds:")
                 bullets(cmds.keys())
 
-            with ConfigFile(os.path.join(LOCAL_CMDS_DIR, 'cmds.json')) as config:
-                config['cmds'] = cmds
-
+        if restore_global or restore_local:
             info("Done")
         else:
             info("Nothing to do!")
