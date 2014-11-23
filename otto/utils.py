@@ -12,6 +12,21 @@ from shutil import move, copytree, rmtree
 
 from otto import *
 
+def rebuild_root_config(path):
+    def _ottopack_pair(path):
+        dir_path = os.path.dirname(path)
+        pack_name = dir_path.split('/')[-1]
+        return pack_name, dir_path
+
+    find_raw = shell('find %s -name "cmds.json"' % path, echo=False)
+    results = dict(_ottopack_pair(line) for line in find_raw.splitlines())
+
+    config_path = os.path.join(path, 'config.json')
+    with ConfigFile(config_path) as config:
+        config['packs'] = results
+
+    return results
+
 def rebuild_cmd_config(path):
     def _ottocmd_name(code):
         match = re.search("^class (.*?)\(", code)
