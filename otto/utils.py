@@ -237,7 +237,8 @@ class OttoCmd(object):
 
     def cmd_usage(self, args):
         """Print useage for this command and exit."""
-        print "Usage:\n  $ otto %s %s" % (self._name(), ' '.join(args))
+        info("Usage:")
+        blue("  $ otto %s %s" % (self._name(), ' '.join(args)))
         sys.exit()
 
 isOttoCmd = lambda cmd: OttoCmd in getattr(cmd, '__bases__', [])
@@ -300,7 +301,7 @@ def shell(cmd, echo=True, stdout=False):
     outp = ''
     try:
         if echo:
-            blue(" $ %s" % cmd)
+            blue("  $ %s" % cmd)
         if stdout:
             subprocess.call(cmd, shell=True)
         else:
