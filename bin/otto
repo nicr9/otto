@@ -112,6 +112,10 @@ if __name__ == "__main__":
     namespace = parser.parse_args()
 
     cmd = namespace.cmd
+    if not cmd:
+        parser.print_help()
+        exit()
+
     args = namespace.args
     opts = {
             'list_cmds': namespace.list_cmds,
