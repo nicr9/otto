@@ -13,15 +13,8 @@ from otto.utils import bail
 from otto.cmds import DEFAULT_CMDS
 from otto.config import OttoConfig
 
-OTTO_DESC = "A workflow automator written in Python."
-USAGE = """Usage:
-  $ otto COMMAND [ARG1 ARG2 ... ARGN]"""
-
-DEBUG = True
-
 # Paths
 RES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'otto_res')
-DEFAULT_CONFIG = os.path.join(RES_DIR, 'config.json')
 
 class OttoDispatcher(object):
     def __init__(self):
