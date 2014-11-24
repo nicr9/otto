@@ -1,5 +1,5 @@
 from distutils.core import setup
-from otto import OTTO_VERSION
+from otto import OTTO_VERSION, OTTO_DESC
 
 setup(
     name='otto',
@@ -7,7 +7,7 @@ setup(
     author='Nic Roland',
     author_email='nicroland9@gmail.com',
     packages=['otto'],
-    data_files=[('otto_res', ['res/config.json', 'res/done.wav'])],
+    data_files=[('otto_res', ['res/done.wav'])],
     scripts=['bin/otto'],
     description=OTTO_DESC,
     #long_description=open('README.rst').read(),
