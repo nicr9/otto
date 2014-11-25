@@ -1,20 +1,11 @@
 import os.path
 import imp
 from otto import LOCAL_CMDS_DIR
-from otto.utils import info, bail, isOttoCmd
+from otto.utils import info, bail, isOttoCmd, cmd_split
 
 from lament import *
 
 CMDS_FILE = 'cmds.json'
-
-def cmd_split(name):
-    """Given a name, split into (pack, cmd).
-
-    Pack should default to None if indeterminable."""
-    if ':' in name:
-        return name.split(':')[:2]
-    else:
-        return None, name
 
 class CmdStore(object):
     def __init__(self):
