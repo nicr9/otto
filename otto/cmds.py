@@ -27,7 +27,7 @@ class %s(otto.OttoCmd):
     def _create_cmd(self, cmd_name, cmd_args, cmd_dir, pack_name, pack_config):
         file_name = cmd_name + '.py'
         cmd_path = os.path.join(cmd_dir, file_name)
-        cmds_file = os.path.join(cmd_dir, 'cmds.json')
+        cmds_file = os.path.join(cmd_dir, CMDS_FILE)
 
         touch_pack(pack_name)
 

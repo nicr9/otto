@@ -18,10 +18,10 @@ def rebuild_root_config(path):
         pack_name = dir_path.split('/')[-1]
         return pack_name, dir_path
 
-    find_raw = shell('find %s -name "cmds.json"' % path, echo=False)
+    find_raw = shell('find %s -name "%s"' % (path, CMDS_FILE), echo=False)
     results = dict(_ottopack_pair(line) for line in find_raw.splitlines())
 
-    config_path = os.path.join(path, 'config.json')
+    config_path = os.path.join(path, ROOT_FILE)
     with ConfigFile(config_path) as config:
         config['packs'] = results
 
@@ -42,7 +42,7 @@ def rebuild_cmd_config(path):
     if None in results:
         del results[None]
 
-    cmds_config = os.path.join(path, 'cmds.json')
+    cmds_config = os.path.join(path, CMDS_FILE)
     with ConfigFile(cmds_config) as config:
         config['cmds'] = results
 
@@ -62,12 +62,12 @@ def pack_path(pack):
     return os.path.join(pack_root(pack), pack)
 
 def get_packs(src_dir):
-    with ConfigFile(os.path.join(src_dir, 'config.json')) as config:
+    with ConfigFile(os.path.join(src_dir, ROOT_FILE)) as config:
         return config.get('packs', {})
 
 def pack_empty(pack):
     path = pack_path(pack)
-    with ConfigFile(os.path.join(path, 'cmds.json')) as config:
+    with ConfigFile(os.path.join(path, CMDS_FILE)) as config:
         return len(config.get('cmds', {})) == 0
 
 ### Manipulate Packs
@@ -77,24 +77,24 @@ def touch_pack(pack):
     dest = pack_path(pack)
     ensure_dir(dest)
 
-    root_config = os.path.join(pack_root(pack), 'config.json')
+    root_config = os.path.join(pack_root(pack), ROOT_FILE)
     with ConfigFile(root_config, True) as config:
         packs = config.setdefault('packs', {})
         packs[pack] = dest
 
-    cmds_config = os.path.join(pack_path(pack), 'cmds.json')
+    cmds_config = os.path.join(pack_path(pack), CMDS_FILE)
     with ConfigFile(cmds_config, True) as local_cmds:
         cmds = local_cmds.setdefault('cmds', {})
 
 def update_packs(src_dir, new_packs):
-    with ConfigFile(os.path.join(src_dir, 'config.json'), True) as config:
+    with ConfigFile(os.path.join(src_dir, ROOT_FILE), True) as config:
         packs = config.setdefault('packs', {})
         packs.update(new_packs)
 
 def move_pack(src_path, src_pack, dest_pack):
     dest = os.path.join(src_path, dest_pack)
     # Add pack to dest config
-    with ConfigFile(os.path.join(src_path, 'config.json')) as config:
+    with ConfigFile(os.path.join(src_path, ROOT_FILE)) as config:
         config['packs'][dest_pack] = dest_pack
         del config['packs'][src_pack]
 
@@ -115,7 +115,7 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack=None):
     ensure_dir(dest_path)
 
     # Add pack to dest config
-    with ConfigFile(os.path.join(dest_path, 'config.json'), True) as config:
+    with ConfigFile(os.path.join(dest_path, ROOT_FILE), True) as config:
         packs = config.setdefault('packs', {})
         packs[dest_pack] = dest
 
@@ -129,8 +129,8 @@ def clone_pack(src_path, src_pack, dest_path, dest_pack=None):
     fix_cmds(dest)
 
 def rm_pack(parent_path, pack):
-    """Clear any entries relating to a pack from it's parent's config.json."""
-    config_path = os.path.join(parent_path, 'config.json')
+    """Clear any entries relating to a pack from it's parent's ROOT_FILE."""
+    config_path = os.path.join(parent_path, ROOT_FILE)
 
     # Remove pack from config
     with ConfigFile(config_path) as config:
@@ -170,7 +170,7 @@ def cmd_split(name, default_pack=None):
 
 def fix_cmds(dest):
     """Change cmd.json cmds values from file names to absolute paths."""
-    with ConfigFile(os.path.join(dest, 'cmds.json')) as config:
+    with ConfigFile(os.path.join(dest, CMDS_FILE)) as config:
         cmds = config.setdefault('cmds', {})
         for key in cmds:
             rel_path = os.path.join(dest, "%s.py" % key)
@@ -186,7 +186,7 @@ def move_cmd(src, dest):
     rename = src_cmd != dest_cmd
 
     # Verify old config
-    src_cmds_json = os.path.join(src_path, 'cmds.json')
+    src_cmds_json = os.path.join(src_path, CMDS_FILE)
     if not os.path.isfile(src_cmds_json):
         bail("Can't mv %s:%s, config not found." % (src_pack, src_cmd))
 
@@ -195,7 +195,7 @@ def move_cmd(src, dest):
     with ConfigFile(src_cmds_json) as config:
         py_path = config['cmds'].pop(src_cmd, None)
 
-    # If cmds.json was corrupt, figure out src file path
+    # If CMDS_FILE was corrupt, figure out src file path
     if not py_path:
         py_path = os.path.join(src_path, "%s.py" % src_cmd)
 
@@ -211,7 +211,7 @@ def move_cmd(src, dest):
     move(py_path, dest_file)
 
     # Update new config
-    with ConfigFile(os.path.join(dest_path, 'cmds.json')) as config:
+    with ConfigFile(os.path.join(dest_path, CMDS_FILE)) as config:
         config['cmds'][dest_cmd] = ''
     fix_cmds(dest_path)
 
@@ -226,7 +226,7 @@ def clone_all(src, dest): # TODO: Test this
     ensure_dir(dest)
 
     # Add pack to dest config
-    with ConfigFile(os.path.join(src, 'config.json')) as config:
+    with ConfigFile(os.path.join(src, ROOT_FILE)) as config:
         src_packs = config.setdefault('packs', {})
         for pack_name, pack_path in src_packs:
             clone_pack(
@@ -286,7 +286,7 @@ def open_config(config_path=None):
     return config
 
 def save_config(config, config_path=None):
-    """Save config to ./.otto/config.json"""
+    """Save config to LOCAL_CONFIG"""
     config_dir, config_path = _config_dir_and_path(config_path)
 
     ensure_dir(config_dir)

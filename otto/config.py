@@ -1,11 +1,9 @@
 import os.path
 import imp
-from otto import LOCAL_CMDS_DIR
+from otto import LOCAL_CMDS_DIR, CMDS_FILE
 from otto.utils import info, bail, isOttoCmd, cmd_split
 
 from lament import *
-
-CMDS_FILE = 'cmds.json'
 
 class CmdStore(object):
     def __init__(self):
