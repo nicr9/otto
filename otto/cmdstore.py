@@ -65,9 +65,8 @@ class CmdStore(object):
 
     def list_cmds(self, pack=None):
         if pack is None:
-            installed = self.packs - set(['base', 'local'])
             self._print('base')
-            for key in installed:
+            for key in self.installed_packs():
                 self._print(key)
             self._print('local')
         else:
