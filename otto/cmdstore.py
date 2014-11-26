@@ -57,20 +57,20 @@ class CmdStore(object):
         except Exception as e:
             raise e
 
-    def _print(self, pack):
-        if pack in self.packs:
-            print "* %s" % pack
-            for cmd in self.cmds[pack]:
-                print "  - %s" % cmd
-
     def list_cmds(self, pack=None):
+        def _print_pack_contents(pack):
+            if pack in self.packs:
+                print "* %s" % pack
+                for cmd in self.cmds[pack]:
+                    print "  - %s" % cmd
+
         if pack is None:
-            self._print('base')
+            _print_pack_contents('base')
             for key in self.installed_packs():
-                self._print(key)
-            self._print('local')
+                _print_pack_contents(key)
+            _print_pack_contents('local')
         else:
-            self._print(pack)
+            _print_pack_contents(pack)
 
     def _run(self, pack, name, *args, **kwargs):
         cmd = self.cmds[pack][name]
