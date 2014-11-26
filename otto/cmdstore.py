@@ -2,6 +2,7 @@ import os.path
 import imp
 from otto import LOCAL_CMDS_DIR, CMDS_FILE
 from otto.utils import info, bail, isOttoCmd, cmd_split
+from lament import ConfigFile
 
 
 class CmdStore(object):
