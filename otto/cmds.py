@@ -275,4 +275,4 @@ class Dr(OttoCmd):
         else:
             info("Nothing to do!")
 
-DEFAULT_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}
+BASE_CMDS = {z._name(): z for z in OttoCmd.__subclasses__()}

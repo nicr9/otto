@@ -10,7 +10,7 @@ import shutil
 
 from otto import *
 from otto.utils import bail
-from otto.cmds import DEFAULT_CMDS
+from otto.cmds import BASE_CMDS
 from otto.config import OttoConfig
 
 # Paths
@@ -20,7 +20,7 @@ class OttoDispatcher(object):
     def __init__(self):
         # Default config/conmands
         self.config = OttoConfig()
-        self.config.packs.init(DEFAULT_CMDS)
+        self.config.packs.init(BASE_CMDS)
 
         # Check ~/.otto for changes to config
         self.config.update_from_file(GLOBAL_CONFIG)
