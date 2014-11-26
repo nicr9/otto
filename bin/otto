@@ -118,9 +118,6 @@ if __name__ == "__main__":
     namespace = parser.parse_args()
 
     cmd = namespace.cmd
-    if not cmd:
-        parser.print_help()
-        exit()
 
     args = namespace.args
     opts = {
@@ -128,5 +125,9 @@ if __name__ == "__main__":
             'cmd_docs': namespace.cmd_docs,
             'print_version': namespace.print_version,
             }
+
+    if not (cmd or any(opts.values())):
+        parser.print_help()
+        exit()
 
     bootstrap(cmd, args, opts)
