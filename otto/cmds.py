@@ -95,6 +95,7 @@ class Mv(OttoCmd):
     def run(self, src, dest):
         src_pack, src_cmd = cmd_split(src, default_pack='local')
         dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
+        dest_file = os.path.join(pack_path(dest_pack), "%s.py" % dest_cmd)
 
         # Work out exactly what actions to do
         moving = src_pack != dest_pack
@@ -106,7 +107,7 @@ class Mv(OttoCmd):
             move_cmd(src, dest)
         if renaming:
             info("Renaming...")
-            rename_ottocmd(src_cmd, dest_cmd, pack_path(dest_pack))
+            rename_ottocmd(src_cmd, dest_cmd, dest_file)
         if not (moving or renaming):
             bail("Nothing to do.")
 
