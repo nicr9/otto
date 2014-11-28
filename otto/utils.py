@@ -183,8 +183,6 @@ def move_cmd(src, dest):
     dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
     dest_path = pack_path(dest_pack)
 
-    rename = src_cmd != dest_cmd
-
     # Verify old config
     src_cmds_json = os.path.join(src_path, CMDS_FILE)
     if not os.path.isfile(src_cmds_json):
