@@ -107,7 +107,7 @@ class Mv(OttoCmd):
             move_cmd(src, dest)
         if renaming:
             info("Renaming...")
-            rename_ottocmd(src_cmd, dest_cmd, dest_file)
+            rename_cmd(dest_pack, src_cmd, dest_cmd)
         if not (moving or renaming):
             bail("Nothing to do.")
 

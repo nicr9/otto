@@ -145,15 +145,6 @@ def del_pack(parent_path, pack):
     if os.path.isdir(target_path):
         rmtree(target_path)
 
-def rename_ottocmd(src_cmd, dest_cmd, file_path):
-    """Edits OttoCmd name within a file."""
-    command = r"sed -i 's/class %s(otto.OttoCmd):/class %s(otto.OttoCmd):/' %s"
-    shell(command % (
-        src_cmd.capitalize(),
-        dest_cmd.capitalize(),
-        file_path
-        ))
-
 ### Cmd Info
 
 def cmd_split(name, default_pack=None):
@@ -177,10 +168,10 @@ def fix_cmds(dest):
             cmds[key] = os.path.abspath(rel_path)
 
 def move_cmd(src, dest):
-    """Move a cmd from one pack to an other."""
+    """Move a cmd from one pack to an other. Does not rename cmds."""
     src_pack, src_cmd = cmd_split(src, default_pack='local')
     src_path = pack_path(src_pack)
-    dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
+    dest_pack, _ = cmd_split(dest, default_pack='local')
     dest_path = pack_path(dest_pack)
 
     # Verify old config
@@ -189,24 +180,39 @@ def move_cmd(src, dest):
         bail("Can't mv %s:%s, config not found." % (src_pack, src_cmd))
 
     # Update old config
-    py_path = None
+    src_file = None
     with ConfigFile(src_cmds_json) as config:
-        py_path = config['cmds'].pop(src_cmd, None)
+        src_file = config['cmds'].pop(src_cmd, None)
 
     # If CMDS_FILE was corrupt, figure out src file path
-    if not py_path:
-        py_path = os.path.join(src_path, "%s.py" % src_cmd)
+    if not src_file:
+        src_file = os.path.join(src_path, "%s.py" % src_cmd)
 
     # Make sure src file exists
-    if not os.path.isfile(py_path):
+    if not os.path.isfile(src_file):
         bail("Couldn't find %s.py" % src_cmd)
 
     # Touch dest_pack
     touch_pack(dest_pack)
 
     # Move .py
+    dest_file = os.path.join(dest_path, "%s.py" % src_cmd)
+    move(src_file, dest_file)
+
+    # Update new config
+    dest_cmds_json = os.path.join(dest_path, CMDS_FILE)
+    with ConfigFile(dest_cmds_json) as config:
+        config['cmds'][src_cmd] = ''
+    fix_cmds(dest_path)
+
+def rename_cmd(pack, src_cmd, dest_cmd):
+    """Changes .py file, OttoCmd and updates config to reflect new name."""
+    dest_path = pack_path(pack)
+
+    # Move .py
+    src_file = os.path.join(dest_path, "%s.py" % src_cmd)
     dest_file = os.path.join(dest_path, "%s.py" % dest_cmd)
-    move(py_path, dest_file)
+    move(src_file, dest_file)
 
     # Update new config
     with ConfigFile(os.path.join(dest_path, CMDS_FILE)) as config:
@@ -215,9 +221,17 @@ def move_cmd(src, dest):
 
     # Remove compiled file (*.pyc)
     try:
-        os.remove(os.path.join(src_path, "%s.pyc" % src_cmd))
+        os.remove(os.path.join(dest_path, "%s.pyc" % src_cmd))
     except OSError:
         pass
+
+    # Edit OttoCmd class name inside file
+    command = r"sed -i 's/class %s(otto.OttoCmd):/class %s(otto.OttoCmd):/' %s"
+    shell(command % (
+        src_cmd.capitalize(),
+        dest_cmd.capitalize(),
+        dest_file
+        ), echo=False)
 
 def clone_all(src, dest): # TODO: Test this
     """Clone a dir containing multiple packs to a different location."""
