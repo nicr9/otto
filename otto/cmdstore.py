@@ -1,7 +1,7 @@
 import os.path
 import imp
 from otto import LOCAL_CMDS_DIR, CMDS_FILE
-from otto.utils import info, bail, isOttoCmd, cmd_split
+from otto.utils import info, bail, isOttoCmd, cmd_split, orange
 from lament import ConfigFile
 
 
@@ -19,7 +19,8 @@ class CmdStore(object):
 
     def loadpack(self, pack, cmds_dir):
         try:
-            with ConfigFile(os.path.join(cmds_dir, CMDS_FILE)) as config:
+            config_path = os.path.join(cmds_dir, CMDS_FILE)
+            with ConfigFile(config_path) as config:
                 if 'cmds' in config:
                     for name, path in config['cmds'].iteritems():
                         self._add_cmd(
@@ -28,7 +29,7 @@ class CmdStore(object):
                                 path
                                 )
         except Exception as e:
-            pass
+            orange("WARNING: %s may be corrupt, please run `otto dr`" % config_path)
         else:
             self._dirs[pack] = cmds_dir
 
