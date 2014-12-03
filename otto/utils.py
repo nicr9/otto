@@ -216,6 +216,7 @@ def rename_cmd(pack, src_cmd, dest_cmd):
 
     # Update new config
     with ConfigFile(os.path.join(dest_path, CMDS_FILE)) as config:
+        config['cmds'].pop(src_cmd)
         config['cmds'][dest_cmd] = ''
     fix_cmds(dest_path)
 
