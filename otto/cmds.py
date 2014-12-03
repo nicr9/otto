@@ -244,6 +244,13 @@ class Wait(OttoCmd):
 class Dr(OttoCmd):
     """Diagnose and repair problems."""
 
+    @staticmethod
+    def _file_check(cmd_name, path):
+        file_name = os.path.basename(path)
+
+        # Compare cmd name to file name w/o extention
+        return cmd_name == file_name[:-3]
+
     def run(self):
         restore_global = os.path.isdir(GLOBAL_DIR)
         restore_local = os.path.isdir(LOCAL_CMDS_DIR)
@@ -252,8 +259,23 @@ class Dr(OttoCmd):
             info("Restoring global config files...")
             packs = rebuild_root_config(GLOBAL_DIR)
 
-            for pack, pack_path in packs.iteritems():
-                cmds = rebuild_cmd_config(pack_path)
+            for pack, path in packs.iteritems():
+                cmds = rebuild_cmd_config(path)
+
+                # Rename any files that don't match up with OttoCmd
+                rename_files = {name: path
+                        for name, path in cmds.iteritems()
+                        if not self._file_check(name, path)}
+                for name, old_path in rename_files.iteritems():
+                    new_path = os.path.join(path, "%s.py" % name)
+                    move(old_path, new_path)
+                    cmds[name] = new_path
+
+                # Update pack config with any changes
+                pack_cmds_config = os.path.join(pack_path(pack), CMDS_FILE)
+                with ConfigFile(pack_cmds_config) as config:
+                    config['cmds'] = cmds
+
                 if cmds:
                     info("Pack '%s' contains:" % pack)
                     bullets(cmds.keys())
@@ -267,6 +289,21 @@ class Dr(OttoCmd):
             rebuild_root_config(LOCAL_DIR)
 
             cmds = rebuild_cmd_config(LOCAL_CMDS_DIR)
+
+            # Rename any files that don't match up with OttoCmd
+            rename_files = {name: path
+                    for name, path in cmds.iteritems()
+                    if not self._file_check(name, path)}
+            for name, old_path in rename_files.iteritems():
+                new_path = os.path.join(LOCAL_CMDS_DIR, "%s.py" % name)
+                move(old_path, new_path)
+                cmds[name] = new_path
+
+            # Update pack config with any changes
+            pack_cmds_config = os.path.join(LOCAL_CMDS_DIR, CMDS_FILE)
+            with ConfigFile(pack_cmds_config) as config:
+                config['cmds'] = cmds
+
             if cmds:
                 info("Local cmds:")
                 bullets(cmds.keys())
