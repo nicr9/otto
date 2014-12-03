@@ -8,14 +8,14 @@ from lament import ConfigFile
 class CmdStore(object):
     def __init__(self):
         self.pack_keys = set()
-        self.cmds = {}
+        self.cmd_keys = {}
         self._dirs = {}
         self._ready = False
 
     def init(self, default_cmds=None):
         self._ready = True
         self.pack_keys = set(['base'])
-        self.cmds['base'] = default_cmds
+        self.cmd_keys['base'] = default_cmds
 
     def loadpack(self, pack, cmds_dir):
         try:
@@ -36,7 +36,7 @@ class CmdStore(object):
     def _add_cmd(self, pack, name, cmd):
         assert os.path.isfile(cmd)
         self.pack_keys.add(pack)
-        cmds = self.cmds.setdefault(pack, {})
+        cmds = self.cmd_keys.setdefault(pack, {})
         cmds[name] = cmd
 
     def _load_cmd(self, pack, name, cmd_ref):
@@ -62,7 +62,7 @@ class CmdStore(object):
         def _print_pack_contents(pack):
             if pack in self.pack_keys:
                 print "* %s" % pack
-                for cmd in self.cmds[pack]:
+                for cmd in self.cmd_keys[pack]:
                     print "  - %s" % cmd
 
         if pack is None:
@@ -74,7 +74,7 @@ class CmdStore(object):
             _print_pack_contents(pack)
 
     def _run(self, pack, name, *args, **kwargs):
-        cmd = self.cmds[pack][name]
+        cmd = self.cmd_keys[pack][name]
         ottocmd = self._load_cmd(pack, name, cmd)(self) # Import & __init__
         ottocmd.run(*args, **kwargs)
 
@@ -89,17 +89,17 @@ class CmdStore(object):
     def find_pack(self, cmd):
         """Given a cmd, determine which pack it belongs to."""
         # Local cmds take presidence
-        if 'local' in self.cmds:
-            if cmd in self.cmds['local']:
+        if 'local' in self.cmd_keys:
+            if cmd in self.cmd_keys['local']:
                 return 'local'
 
         # Then check installed cmds
         for key in self.installed_packs():
-            if cmd in self.cmds[key]:
+            if cmd in self.cmd_keys[key]:
                 return key
 
         # default to base cmds if able
-        if cmd in self.cmds['base']:
+        if cmd in self.cmd_keys['base']:
             return 'base'
 
     def lookup(self, name):
@@ -117,7 +117,7 @@ class CmdStore(object):
     def docs(self, name):
         # Find OttoCmd class
         pack, cmd = self.lookup(name)
-        ottocmd = self.cmds[pack][cmd]
+        ottocmd = self.cmd_keys[pack][cmd]
         if isinstance(ottocmd, unicode):
             ottocmd = self._load_cmd(pack, cmd, ottocmd)
 
@@ -139,13 +139,13 @@ class CmdStore(object):
         """Check whether a pack/cmd name pair is already in use."""
         if pack == 'base':
             return False
-        elif pack not in self.cmds:
+        elif pack not in self.cmd_keys:
             return True
         else:
-            return cmd not in self.cmds[pack]
+            return cmd not in self.cmd_keys[pack]
 
     def is_used(self, pack, cmd):
-        if pack in self.cmds and cmd in self.cmds[pack]:
+        if pack in self.cmd_keys and cmd in self.cmd_keys[pack]:
             return True
         else:
             return False
