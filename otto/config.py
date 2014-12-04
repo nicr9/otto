@@ -12,7 +12,7 @@ class OttoConfig(LamentConfig):
     @config('packs', CmdStore)
     def packs(self, config, obj):
         for key, val in obj.iteritems():
-            config.loadpack(key, val)
+            config.load_pack(key, val)
         return config
 
     @export('packs')
