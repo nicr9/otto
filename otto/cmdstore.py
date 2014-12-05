@@ -29,7 +29,7 @@ class CmdStore(object):
                                 path
                                 )
 
-        except Exception as e:
+        except Exception:
             orange("WARNING: %s may be corrupt, please run `otto dr`" % config_path)
         else:
             self._pack_dirs[pack_name] = pack_dir
@@ -38,7 +38,7 @@ class CmdStore(object):
         assert os.path.isfile(cmd_path)
         self.pack_keys.add(pack_name)
         cmds = self.cmds_by_pack.setdefault(pack_name, {})
-        cmds[cmd_name] = cmd
+        cmds[cmd_name] = cmd_path
 
     def _load_cmd(self, pack_name, cmd_name, cmd_path):
         if isOttoCmd(cmd_path):

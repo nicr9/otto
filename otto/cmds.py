@@ -86,7 +86,7 @@ class Edit(OttoCmd):
             if pack == 'base':
                 info("Sorry, you can't edit base cmds like %s" % name)
             else:
-                cmd_path = self._store.cmds[pack][name]
+                cmd_path = self._store.cmds_by_pack[pack][name]
                 edit_file(cmd_path)
 
 class Mv(OttoCmd):
