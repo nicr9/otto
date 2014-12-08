@@ -20,7 +20,7 @@ class OttoDispatcher(object):
     def __init__(self):
         # Default config/conmands
         self.config = OttoConfig()
-        self.config.packs.init(BASE_CMDS)
+        self.config.packs.init_base(BASE_CMDS)
 
         # Check ~/.otto for changes to config
         self.config.update_from_file(GLOBAL_CONFIG)
