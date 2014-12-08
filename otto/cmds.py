@@ -46,13 +46,6 @@ class %s(otto.OttoCmd):
         # Allow user to implement new cmd
         edit_file(cmd_path)
 
-    def _split(self, name):
-        cmd_split = name.split(':')
-        if len(cmd_split) >= 2:
-            return cmd_split[:2]
-        else:
-            return 'local', name
-
     def run(self, *args):
         if not args:
             self.cmd_usage(['new_cmd_name', '[cmd_arg_1 ...]'])
