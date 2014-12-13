@@ -1,11 +1,13 @@
-"""The following terms are used throughout this file, I thought their use as variable names should be clarified and standardised:
-* cmd - the name of an executable cmd.
-* pack - the name of a collection of cmds.
-* name - Ambiguous, either the name of a cmd or a pack:cmd pair (use cmd_split())
-* ottocmd - cmd object.
-* cmd_ref - either the path to a file containing code for a cmd, or the cmd object itself.
+"""The following terms are used throughout this file, I thought their use as
+variable names should be clarified and standardised:
+
+* cmd, cmd_name - the name of an executable cmd.
+* pack, pack_name - the name of a collection of cmds.
+* name - Ambiguous, a cmd name (w/ or w/o pack name) in "[pack:]cmd" format.
+* ottocmd - OttoCmd instance.
+* cmd_ref - Ambiguous, either the path to a cmd file, or the cmd object itself.
 * pack_keys - a set of pack names.
-* pack_cmds - {pack : {cmd: cmd_ref}}
+* cmds_by_pack - {pack_name : {cmd_name: cmd_ref}}
 """
 import os.path
 import imp
@@ -97,15 +99,15 @@ class CmdStore(object):
         else:
             _print_pack_contents(pack)
 
-    def _run(self, pack_name, cmd_name, *args, **kwargs):
+    def run(self, name, *args, **kwargs):
         """Looks up cmd class in cache, initialises it and runs it."""
+        # Find cmd ref
+        pack_name, cmd_name = self.lookup(name)
         cmd_ref = self.cmds_by_pack[pack_name][cmd_name]
+
+        # Init and run
         ottocmd = self._load_cmd(pack_name, cmd_name, cmd_ref)(self)
         ottocmd.run(*args, **kwargs)
-
-    def run(self, name, *args, **kwargs):
-        pack, cmd = self.lookup(name)
-        self._run(pack, cmd, *args, **kwargs)
 
     def installed_packs(self):
         """Returns a set of available pack names, excluding base and local."""
