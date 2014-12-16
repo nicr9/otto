@@ -246,7 +246,7 @@ class Dr(OttoCmd):
 
     def run(self):
         restore_global = os.path.isdir(GLOBAL_DIR)
-        restore_local = os.path.isdir(LOCAL_CMDS_DIR)
+        restore_local = os.path.isdir(LOCAL_DIR)
 
         if restore_global:
             info("Restoring global config files...")
@@ -256,9 +256,9 @@ class Dr(OttoCmd):
                 cmds = rebuild_cmd_config(path)
 
                 # Rename any files that don't match up with OttoCmd
-                rename_files = {name: path
-                        for name, path in cmds.iteritems()
-                        if not self._file_check(name, path)}
+                rename_files = {name: file_path
+                        for name, file_path in cmds.iteritems()
+                        if not self._file_check(name, file_path)}
                 for name, old_path in rename_files.iteritems():
                     new_path = os.path.join(path, "%s.py" % name)
                     move(old_path, new_path)
@@ -279,27 +279,32 @@ class Dr(OttoCmd):
 
         if restore_local:
             info("Restoring local config files...")
-            rebuild_root_config(LOCAL_DIR)
+            packs = rebuild_root_config(LOCAL_DIR)
 
-            cmds = rebuild_cmd_config(LOCAL_CMDS_DIR)
+            for pack, path in packs.iteritems():
+                cmds = rebuild_cmd_config(path)
 
-            # Rename any files that don't match up with OttoCmd
-            rename_files = {name: path
-                    for name, path in cmds.iteritems()
-                    if not self._file_check(name, path)}
-            for name, old_path in rename_files.iteritems():
-                new_path = os.path.join(LOCAL_CMDS_DIR, "%s.py" % name)
-                move(old_path, new_path)
-                cmds[name] = new_path
+                # Rename any files that don't match up with OttoCmd
+                rename_files = {name: file_path
+                        for name, file_path in cmds.iteritems()
+                        if not self._file_check(name, file_path)}
+                for name, old_path in rename_files.iteritems():
+                    new_path = os.path.join(path, "%s.py" % name)
+                    move(old_path, new_path)
+                    cmds[name] = new_path
 
-            # Update pack config with any changes
-            pack_cmds_config = os.path.join(LOCAL_CMDS_DIR, CMDS_FILE)
-            with ConfigFile(pack_cmds_config) as config:
-                config['cmds'] = cmds
+                # Update pack config with any changes
+                pack_cmds_config = os.path.join(pack_path(path), CMDS_FILE)
+                with ConfigFile(pack_cmds_config) as config:
+                    config['cmds'] = cmds
 
-            if cmds:
-                info("Local cmds:")
-                bullets(cmds.keys())
+                if cmds:
+                    info("Local pack %s contains:" % pack)
+                    bullets(cmds.keys())
+                else:
+                    info("Local pack '%s' is empty, deleting it..." % pack)
+                    rm_pack(LOCAL_DIR, pack)
+                    del_pack(LOCAL_DIR, pack)
 
         if restore_global or restore_local:
             info("Done")
