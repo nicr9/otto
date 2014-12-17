@@ -1,10 +1,11 @@
 import unittest
 
-from os.path import dirname, join
+from os.path import dirname, join, isfile
 from tempfile import NamedTemporaryFile as TF
 
 from otto.config import CmdStore
 from otto.cmds import BASE_CMDS
+from otto.utils import isOttoCmd
 
 TEST_DIR = dirname(__file__)
 DEFAULT_MAP = map = {
@@ -63,6 +64,22 @@ class TestCmdStore(unittest.TestCase):
         map = DEFAULT_MAP.copy()
         map.update(PACK_MAP)
         self.check_store(map)
+
+    def test_load_cmd(self):
+        # Make sure _load_cmd will always do nothing to a base cmd
+        for cmd_name, cmd_ref in BASE_CMDS.iteritems():
+            result = self.target._load_cmd('base', cmd_name, cmd_ref)
+            self.assertTrue(isOttoCmd(result))
+
+        # Make sure all refs for installed packs are paths...
+        self.target.load_pack(PACK_NAME, PACK_DIR)
+        test_pack = self.target.cmds_by_pack[PACK_NAME]
+        for cmd_name, cmd_ref in test_pack.iteritems():
+            self.assertTrue(isfile(cmd_ref))
+
+            # ... and that they return from _load_cmd as an OttoCmd
+            result = self.target._load_cmd(PACK_NAME, cmd_name, cmd_ref)
+            self.assertTrue(isOttoCmd(result))
 
     def test_lookup(self):
         self.target.load_pack(PACK_NAME, PACK_DIR)
