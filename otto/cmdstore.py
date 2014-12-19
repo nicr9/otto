@@ -74,7 +74,8 @@ class CmdStore(object):
                     )
             cmd_class = getattr(cmd_module, cmd_name.capitalize(), None)
             if not isOttoCmd(cmd_class):
-                print cmd_name, "could not be loaded from", cmd_ref
+                msg = "'%s' could not be loaded from %s" % (cmd_name, cmd_ref)
+                bail(msg)
             else:
                 return cmd_class
 
