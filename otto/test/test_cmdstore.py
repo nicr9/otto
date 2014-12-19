@@ -81,6 +81,14 @@ class TestCmdStore(unittest.TestCase):
             result = self.target._load_cmd(PACK_NAME, cmd_name, cmd_ref)
             self.assertTrue(isOttoCmd(result))
 
+    def test_load_cmd_fail(self):
+        self.target.load_pack(PACK_NAME, PACK_DIR)
+        cmd_ref = self.target.cmds_by_pack[PACK_NAME]['test2']
+
+        # Wrong test name
+        with self.assertRaises(SystemExit):
+            result = self.target._load_cmd(PACK_NAME, 'test3', cmd_ref)
+
     def test_lookup(self):
         self.target.load_pack(PACK_NAME, PACK_DIR)
     
@@ -89,6 +97,7 @@ class TestCmdStore(unittest.TestCase):
         self.assertEqual(self.target.lookup('test:test1'), ('test', 'test1'))
         self.assertEqual(self.target.lookup('test:test2'), ('test', 'test2'))
 
+    def test_lookup_fail(self):
         with self.assertRaises(SystemExit):
             self.target.lookup('test3')
 
