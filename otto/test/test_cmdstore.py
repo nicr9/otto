@@ -101,3 +101,32 @@ class TestCmdStore(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self.target.lookup('test3')
 
+    def test_installed_packs(self):
+        self.target.load_pack(PACK_NAME, PACK_DIR)
+
+        result = self.target.installed_packs()
+        expected = set([PACK_NAME])
+        self.assertEqual(expected, result)
+
+        self.target.pack_keys.update(set(['fake1', 'fake2']))
+        result = self.target.installed_packs()
+        expected = set([PACK_NAME, 'fake1' ,'fake2'])
+        self.assertEqual(expected, result)
+
+        self.target.pack_keys.difference_update(set(['base', 'local']))
+        result = self.target.installed_packs()
+        expected = set([PACK_NAME, 'fake1' ,'fake2'])
+        self.assertEqual(expected, result)
+
+    def test_find_pack(self):
+        self.target.load_pack(PACK_NAME, PACK_DIR)
+
+        result = self.target.find_pack('test1')
+        self.assertEqual(PACK_NAME, result)
+
+        self.target.cmds_by_pack['local'] = {'test1': None}
+        result = self.target.find_pack('test1')
+        self.assertEqual('local', result)
+
+        result = self.target.find_pack('fake')
+        self.assertEqual(None, result)
