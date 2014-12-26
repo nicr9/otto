@@ -51,12 +51,11 @@ class CmdStore(object):
         cmd_refs = self.cmds_by_pack.setdefault(pack_name, {})
         cmd_refs[cmd_name] = cmd_path
 
-    def _load_cmd(self, pack_name, cmd_name, cmd_ref):
+    def _load_cmd(self, cmd_name, cmd_ref):
         """Because some cmds are stored in the cache as either a class or as a
         path to the .py file, this method is needed to disambiguate.
 
         Given the following arguments:
-            pack_name: The pack a cmd belongs to.
             cmd_name: The name of the cmd.
             cmd_ref: Either the OttoCmd object or the path to it's file.
 
@@ -107,7 +106,7 @@ class CmdStore(object):
         cmd_ref = self.cmds_by_pack[pack_name][cmd_name]
 
         # Init and run
-        ottocmd = self._load_cmd(pack_name, cmd_name, cmd_ref)(self)
+        ottocmd = self._load_cmd(cmd_name, cmd_ref)(self)
         ottocmd.run(*args, **kwargs)
 
     def installed_packs(self):
@@ -147,7 +146,7 @@ class CmdStore(object):
         pack, cmd = self.lookup(name)
         ottocmd = self.cmds_by_pack[pack][cmd]
         if isinstance(ottocmd, unicode):
-            ottocmd = self._load_cmd(pack, cmd, ottocmd)
+            ottocmd = self._load_cmd(cmd, ottocmd)
 
         docs = ottocmd.__doc__
         if docs is None:

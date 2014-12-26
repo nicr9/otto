@@ -68,7 +68,7 @@ class TestCmdStore(unittest.TestCase):
     def test_load_cmd(self):
         # Make sure _load_cmd will always do nothing to a base cmd
         for cmd_name, cmd_ref in BASE_CMDS.iteritems():
-            result = self.target._load_cmd('base', cmd_name, cmd_ref)
+            result = self.target._load_cmd(cmd_name, cmd_ref)
             self.assertTrue(isOttoCmd(result))
 
         # Make sure all refs for installed packs are paths...
@@ -78,7 +78,7 @@ class TestCmdStore(unittest.TestCase):
             self.assertTrue(isfile(cmd_ref))
 
             # ... and that they return from _load_cmd as an OttoCmd
-            result = self.target._load_cmd(PACK_NAME, cmd_name, cmd_ref)
+            result = self.target._load_cmd(cmd_name, cmd_ref)
             self.assertTrue(isOttoCmd(result))
 
     def test_load_cmd_fail(self):
@@ -87,7 +87,7 @@ class TestCmdStore(unittest.TestCase):
 
         # Wrong test name
         with self.assertRaises(SystemExit):
-            result = self.target._load_cmd(PACK_NAME, 'test3', cmd_ref)
+            result = self.target._load_cmd('test3', cmd_ref)
 
     def test_lookup(self):
         self.target.load_pack(PACK_NAME, PACK_DIR)
