@@ -3,6 +3,7 @@ import unittest
 from os.path import dirname, join, isfile
 from tempfile import NamedTemporaryFile as TF
 
+from otto import LOCAL_PACK
 from otto.config import CmdStore
 from otto.cmds import BASE_CMDS
 from otto.utils import isOttoCmd
@@ -113,7 +114,7 @@ class TestCmdStore(unittest.TestCase):
         expected = set([PACK_NAME, 'fake1' ,'fake2'])
         self.assertEqual(expected, result)
 
-        self.target.pack_keys.difference_update(set(['base', 'local']))
+        self.target.pack_keys.difference_update(set(['base', LOCAL_PACK]))
         result = self.target.installed_packs()
         expected = set([PACK_NAME, 'fake1' ,'fake2'])
         self.assertEqual(expected, result)
@@ -124,9 +125,9 @@ class TestCmdStore(unittest.TestCase):
         result = self.target.find_pack('test1')
         self.assertEqual(PACK_NAME, result)
 
-        self.target.cmds_by_pack['local'] = {'test1': None}
+        self.target.cmds_by_pack[LOCAL_PACK] = {'test1': None}
         result = self.target.find_pack('test1')
-        self.assertEqual('local', result)
+        self.assertEqual(LOCAL_PACK, result)
 
         result = self.target.find_pack('fake')
         self.assertEqual(None, result)

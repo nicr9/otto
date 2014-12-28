@@ -55,7 +55,7 @@ def bail(msg=None):
 ### Pack Info
 
 def pack_root(pack):
-    return LOCAL_DIR if pack == 'local' else GLOBAL_DIR
+    return LOCAL_DIR if pack == LOCAL_PACK else GLOBAL_DIR
 
 def pack_path(pack):
     """Determine a pack's directory."""
@@ -169,9 +169,9 @@ def fix_cmds(dest):
 
 def move_cmd(src, dest):
     """Move a cmd from one pack to an other. Does not rename cmds."""
-    src_pack, src_cmd = cmd_split(src, default_pack='local')
+    src_pack, src_cmd = cmd_split(src, default_pack=LOCAL_PACK)
     src_path = pack_path(src_pack)
-    dest_pack, _ = cmd_split(dest, default_pack='local')
+    dest_pack, _ = cmd_split(dest, default_pack=LOCAL_PACK)
     dest_path = pack_path(dest_pack)
 
     # Verify old config

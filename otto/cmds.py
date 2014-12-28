@@ -50,14 +50,14 @@ class %s(otto.OttoCmd):
         if not args:
             self.cmd_usage(['new_cmd_name', '[cmd_arg_1 ...]'])
         else:
-            pack, cmd = cmd_split(args[0], 'local')
+            pack, cmd = cmd_split(args[0], LOCAL_PACK)
             cmd_args = args[1:]
 
             if not self._store.is_available(pack, cmd):
                 bail("Sorry, you can't do that")
 
-            if pack == 'local':
-                self._create_cmd(cmd, cmd_args, LOCAL_CMDS_DIR, 'local', LOCAL_CONFIG)
+            if pack == LOCAL_PACK:
+                self._create_cmd(cmd, cmd_args, LOCAL_CMDS_DIR, LOCAL_PACK, LOCAL_CONFIG)
             else:
                 cmd_dir = os.path.join(GLOBAL_DIR, pack)
                 self._create_cmd(cmd, cmd_args, cmd_dir, pack, GLOBAL_CONFIG)
@@ -86,8 +86,8 @@ class Mv(OttoCmd):
     """Move a cmd from one pack to an other."""
 
     def run(self, src, dest):
-        src_pack, src_cmd = cmd_split(src, default_pack='local')
-        dest_pack, dest_cmd = cmd_split(dest, default_pack='local')
+        src_pack, src_cmd = cmd_split(src, default_pack=LOCAL_PACK)
+        dest_pack, dest_cmd = cmd_split(dest, default_pack=LOCAL_PACK)
         dest_file = os.path.join(pack_path(dest_pack), "%s.py" % dest_cmd)
 
         # Work out exactly what actions to do
@@ -149,7 +149,7 @@ class Pack(OttoCmd):
 
         # Make copy of .otto/
         info("Cloning local...")
-        clone_pack(LOCAL_DIR, 'local', pack_root, pack_name)
+        clone_pack(LOCAL_DIR, LOCAL_PACK, pack_root, pack_name)
 
         info("Cleaning up a bit...")
         shell(r'find %s -type f -name "*.pyc" -exec rm -f {} \;' % pack_root)

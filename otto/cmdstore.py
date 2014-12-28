@@ -11,7 +11,7 @@ variable names should be clarified and standardised:
 """
 import os.path
 import imp
-from otto import LOCAL_CMDS_DIR, CMDS_FILE
+from otto import LOCAL_PACK, LOCAL_CMDS_DIR, CMDS_FILE
 from otto.utils import info, bail, isOttoCmd, cmd_split, orange
 from lament import ConfigFile
 
@@ -95,7 +95,7 @@ class CmdStore(object):
             _print_pack_contents('base')
             for key in self.installed_packs():
                 _print_pack_contents(key)
-            _print_pack_contents('local')
+            _print_pack_contents(LOCAL_PACK)
         else:
             _print_pack_contents(pack)
 
@@ -111,14 +111,14 @@ class CmdStore(object):
 
     def installed_packs(self):
         """Returns a set of available pack names, excluding base and local."""
-        return self.pack_keys - set(['base', 'local'])
+        return self.pack_keys - set(['base', LOCAL_PACK])
 
     def find_pack(self, cmd):
         """Given a cmd, determine which pack it belongs to."""
         # Local cmds take presidence
-        if 'local' in self.cmds_by_pack:
-            if cmd in self.cmds_by_pack['local']:
-                return 'local'
+        if LOCAL_PACK in self.cmds_by_pack:
+            if cmd in self.cmds_by_pack[LOCAL_PACK]:
+                return LOCAL_PACK
 
         # Then check installed cmds
         for pack in self.installed_packs():
