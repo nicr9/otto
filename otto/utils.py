@@ -349,8 +349,9 @@ def shell(cmd, echo=True, stdout=False):
     finally:
         return outp
 
-def edit_file(file_path):
-    subprocess.call(['vim', file_path])
+def edit_file(file_path, sudo=False):
+    cmd = ['sudo', 'vim', file_path] if sudo else ['vim', file_path]
+    subprocess.call(cmd)
 
 class Dialog(object):
     def __init__(self, header):
