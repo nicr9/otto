@@ -57,9 +57,9 @@ def bail(msg=None):
 def pack_root(pack):
     if pack == 'base':
         return
-    elif pack == LOCAL_PACK
+    elif pack == LOCAL_PACK:
         return LOCAL_DIR
-    else
+    else:
         return GLOBAL_DIR
 
 def pack_path(pack):
