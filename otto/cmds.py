@@ -2,6 +2,7 @@ import os
 import os.path
 
 from lament import ConfigFile
+from dialog import Dialog
 
 from otto import *
 from otto.utils import *
