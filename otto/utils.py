@@ -55,11 +55,17 @@ def bail(msg=None):
 ### Pack Info
 
 def pack_root(pack):
-    return LOCAL_DIR if pack == LOCAL_PACK else GLOBAL_DIR
+    if pack == 'base':
+        return
+    elif pack == LOCAL_PACK
+        return LOCAL_DIR
+    else
+        return GLOBAL_DIR
 
 def pack_path(pack):
     """Determine a pack's directory."""
-    return os.path.join(pack_root(pack), pack)
+    root = pack_root(pack)
+    return os.path.join(root, pack) if root else None
 
 def get_packs(src_dir):
     with ConfigFile(os.path.join(src_dir, ROOT_FILE)) as config:
@@ -74,6 +80,9 @@ def pack_empty(pack):
 
 def touch_pack(pack):
     """Make sure the pack directory exists, create config files as needed."""
+    if pack == 'base':
+        return
+
     dest = pack_path(pack)
     ensure_dir(dest)
 
