@@ -151,7 +151,7 @@ def del_pack(parent_path, pack):
     target_path = pack_path(pack)
 
     # Delete pack dir
-    if os.path.isdir(target_path):
+    if target_path and os.path.isdir(target_path):
         rmtree(target_path)
 
 ### Cmd Info
@@ -180,8 +180,12 @@ def move_cmd(src, dest):
     """Move a cmd from one pack to an other. Does not rename cmds."""
     src_pack, src_cmd = cmd_split(src, default_pack=LOCAL_PACK)
     src_path = pack_path(src_pack)
+    if not src_path:
+        bail("Can't move cmds from base pack.")
     dest_pack, _ = cmd_split(dest, default_pack=LOCAL_PACK)
     dest_path = pack_path(dest_pack)
+    if not dest_path:
+        bail("Can't move cmds to base pack.")
 
     # Verify old config
     src_cmds_json = os.path.join(src_path, CMDS_FILE)
@@ -218,6 +222,9 @@ def rename_cmd(pack, src_cmd, dest_cmd):
     """Changes .py file, OttoCmd and updates config to reflect new name."""
     dest_path = pack_path(pack)
 
+    if not dest_path:
+        bail("Can't rename cmds in base pack.")
+
     # Move .py
     src_file = os.path.join(dest_path, "%s.py" % src_cmd)
     dest_file = os.path.join(dest_path, "%s.py" % dest_cmd)
@@ -250,12 +257,12 @@ def clone_all(src, dest): # TODO: Test this
     # Add pack to dest config
     with ConfigFile(os.path.join(src, ROOT_FILE)) as config:
         src_packs = config.setdefault('packs', {})
-        for pack_name, pack_path in src_packs:
+        for name, path in src_packs:
             clone_pack(
-                    os.path.join(src, pack_path),
-                    pack_name,
-                    os.path.join(dest, pack_path),
-                    pack_name,
+                    os.path.join(src, path),
+                    name,
+                    os.path.join(dest, path),
+                    name,
                     )
 
     update_packs(dest, src_packs)
