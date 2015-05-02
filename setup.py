@@ -10,5 +10,4 @@ setup(
     data_files=[('otto_res', ['res/done.wav'])],
     scripts=['bin/otto'],
     description=OTTO_DESC,
-    #long_description=open('README.rst').read(),
 )
