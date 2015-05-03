@@ -5,8 +5,10 @@ import imp
 import json
 import sys
 import argparse
-from subprocess import call as shcall
 import shutil
+
+from pkg_resources import Requirement, resource_filename
+from subprocess import call as shcall
 
 from otto import *
 from otto.utils import bail
@@ -14,7 +16,7 @@ from otto.cmds import BASE_CMDS
 from otto.config import OttoConfig
 
 # Paths
-RES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'otto_res')
+LOCAL_RES_DIR = os.path.join(os.getcwd(), './otto/res/')
 
 class OttoDispatcher(object):
     def __init__(self):
@@ -46,20 +48,23 @@ class OttoDispatcher(object):
 
     def tone(self):
         if self.config.tone:
-            path = os.path.join(RES_DIR, self.config.tone)
+            local_path = os.path.join(LOCAL_RES_DIR, self.config.tone)
+            global_path = resource_filename(
+                    Requirement.parse("otto"),
+                    self.config.tone)
 
-            if os.path.isfile(self.config.tone):
-                try:
-                    shcall(['aplay', '-q', self.config.tone])
-                except Exception as e:
-                    print "Couldn't play tone (%s)" % e
-            elif os.path.isfile(path):
-                try:
-                    shcall(['aplay', '-q', path])
-                except Exception as e:
-                    print "Couldn't play tone (%s)" % e
+            if os.path.isfile(local_path):
+                path = local_path
+            elif os.path.isfile(global_path):
+                path = global_path
             else:
-                print "tone not found: %s" % path
+                print "Tried looking for tone at %s" % global_path
+                bail("tone not found: %s" % self.config.tone)
+
+            try:
+                shcall(['aplay', '-q', path])
+            except Exception as e:
+                bail("Couldn't play tone: %s" % e)
 
 def bootstrap(cmd, args, opts):
     otto = OttoDispatcher()

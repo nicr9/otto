@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 from otto import OTTO_VERSION, OTTO_DESC
 
 setup(
@@ -7,7 +7,8 @@ setup(
     author='Nic Roland',
     author_email='nicroland9@gmail.com',
     packages=['otto'],
-    data_files=[('otto_res', ['res/done.wav'])],
+    package_data={'otto': ['wavs/*.wav']},
+    zip_safe=False,
     scripts=['bin/otto'],
     description=OTTO_DESC,
 )
