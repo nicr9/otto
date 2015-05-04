@@ -1,70 +1,8 @@
 #! /usr/bin/env python2.7
-import os
-import os.path
-import imp
-import json
-import sys
 import argparse
-import shutil
-
-from pkg_resources import Requirement, resource_filename
-from subprocess import call as shcall
 
 from otto import *
-from otto.utils import bail
-from otto.cmds import BASE_CMDS
-from otto.config import OttoConfig
-
-# Paths
-LOCAL_RES_DIR = os.path.join(os.getcwd(), './otto/res/')
-
-class OttoDispatcher(object):
-    def __init__(self):
-        # Default config/conmands
-        self.config = OttoConfig()
-        self.config.packs.init_base(BASE_CMDS)
-
-        # Check ~/.otto for changes to config
-        self.config.update_from_file(GLOBAL_CONFIG)
-
-        # Check ./.otto for changes to config/available commands
-        self.config.update_from_file(LOCAL_CONFIG)
-
-    def list_cmds(self):
-        self.config.packs.list_cmds()
-
-    def print_docs(self, cmd):
-        self.config.packs.docs(cmd)
-
-    def handle(self, cmd, args):
-        if not args:
-            args = self.config.remember.get(cmd, [])
-        try:
-            self.config.packs.run(cmd, *args)
-        except KeyboardInterrupt:
-            bail()
-
-        self.tone()
-
-    def tone(self):
-        if self.config.tone:
-            local_path = os.path.join(LOCAL_RES_DIR, self.config.tone)
-            global_path = resource_filename(
-                    Requirement.parse("otto"),
-                    self.config.tone)
-
-            if os.path.isfile(local_path):
-                path = local_path
-            elif os.path.isfile(global_path):
-                path = global_path
-            else:
-                print "Tried looking for tone at %s" % global_path
-                bail("tone not found: %s" % self.config.tone)
-
-            try:
-                shcall(['aplay', '-q', path])
-            except Exception as e:
-                bail("Couldn't play tone: %s" % e)
+from otto.dispatcher import OttoDispatcher
 
 def bootstrap(cmd, args, opts):
     otto = OttoDispatcher()
