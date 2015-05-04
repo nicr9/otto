@@ -9,6 +9,7 @@ import re
 from getpass import getpass
 from lament import ConfigFile
 from shutil import move, copytree, rmtree
+from inspect import getargspec
 
 from otto import *
 
@@ -285,9 +286,18 @@ class OttoCmd(object):
 
     def cmd_usage(self, args):
         """Print useage for this command and exit."""
+        info("cmd_usage() is DEPRECATED")
         info("Usage:")
         blue("  $ otto %s %s" % (self._name(), ' '.join(args)))
         sys.exit()
+
+    def usage(self):
+        """Print useage for this command."""
+        spec = getargspec(self.run).args
+        spec[0] = self.__class__.__name__.lower()
+
+        info("Usage:")
+        blue("  $ otto %s" % ' '.join(spec))
 
 isOttoCmd = lambda cmd: OttoCmd in getattr(cmd, '__bases__', [])
 

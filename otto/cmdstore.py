@@ -107,7 +107,10 @@ class CmdStore(object):
 
         # Init and run
         ottocmd = self._load_cmd(cmd_name, cmd_ref)(self)
-        ottocmd.run(*args, **kwargs)
+        try:
+            ottocmd.run(*args, **kwargs)
+        except TypeError as e:
+            ottocmd.usage()
 
     def installed_packs(self):
         """Returns a set of available pack names, excluding base and local."""
