@@ -1,62 +1,8 @@
-#! /usr/bin/python2.7
-import os
-import os.path
-import imp
-import json
-import sys
+#! /usr/bin/env python2.7
 import argparse
-from subprocess import call as shcall
-import shutil
 
 from otto import *
-from otto.cmds import DEFAULT_CMDS
-from otto.config import OttoConfig
-
-OTTO_DESC = "A workflow automator written in Python."
-USAGE = """Usage:
-  $ otto COMMAND [ARG1 ARG2 ... ARGN]"""
-
-DEBUG = True
-
-# Paths
-RES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'otto_res')
-DEFAULT_CONFIG = os.path.join(RES_DIR, 'config.json')
-
-class OttoDispatcher(object):
-    def __init__(self):
-        # Default config/conmands
-        self.config = OttoConfig()
-        self.config.packs.init(DEFAULT_CMDS)
-
-        # Check ~/.otto for changes to config
-        self.config.update_from_file(GLOBAL_CONFIG)
-
-        # Check ./.otto for changes to config/available commands
-        self.config.update_from_file(LOCAL_CONFIG)
-
-    def list_cmds(self):
-        self.config.packs.list_cmds()
-
-    def print_docs(self, cmd):
-        self.config.packs.docs(cmd)
-
-    def handle(self, cmd, args):
-        if not args:
-            args = self.config.remember.get(cmd, [])
-        self.config.packs.run(cmd, *args)
-
-        self.tone()
-
-    def tone(self):
-        if self.config.tone:
-            path = os.path.join(RES_DIR, self.config.tone)
-            if os.path.isfile(path):
-                try:
-                    shcall(['aplay', '-q', path])
-                except Exception as e:
-                    print "Couldn't play tone (%s)" % e
-            else:
-                print "tone not found: %s" % path
+from otto.dispatcher import OttoDispatcher
 
 def bootstrap(cmd, args, opts):
     otto = OttoDispatcher()
@@ -64,24 +10,67 @@ def bootstrap(cmd, args, opts):
         otto.list_cmds()
     elif opts['cmd_docs']:
         otto.print_docs(cmd)
+    elif opts['print_version']:
+        print OTTO_VERSION
     else:
         otto.handle(cmd, args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=OTTO_DESC)
 
-    parser.add_argument('-l', action='store_true', help="List available commands", dest='list_cmds')
-    parser.add_argument('-d', action='store_true', help="print out the docstring for the specified command", dest='cmd_docs')
-    parser.add_argument(action='store', nargs='?', default='', type=str, help="Workflow to run", metavar='command', dest='cmd')
-    parser.add_argument(action='store', nargs='*', type=str, help="Arguments for command", metavar='ARG', dest='args')
+    parser.add_argument(
+            '-l',
+            action='store_true',
+            help="List available commands",
+            dest='list_cmds'
+            )
+
+    parser.add_argument(
+            '-d',
+            action='store_true',
+            help="Print out the docstring for the specified command",
+            dest='cmd_docs'
+            )
+
+    parser.add_argument(
+            '-V',
+            action='store_true',
+            help="Print out version details.",
+            dest='print_version'
+            )
+
+    parser.add_argument(
+            action='store',
+            nargs='?',
+            default='',
+            type=str,
+            help="Workflow to run",
+            metavar='command',
+            dest='cmd'
+            )
+
+    parser.add_argument(
+            action='store',
+            nargs='*',
+            type=str,
+            help="Arguments for command",
+            metavar='ARG',
+            dest='args'
+            )
 
     namespace = parser.parse_args()
 
     cmd = namespace.cmd
+
     args = namespace.args
     opts = {
             'list_cmds': namespace.list_cmds,
             'cmd_docs': namespace.cmd_docs,
+            'print_version': namespace.print_version,
             }
+
+    if not (cmd or any(opts.values())):
+        parser.print_help()
+        exit()
 
     bootstrap(cmd, args, opts)

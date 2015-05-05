@@ -1,13 +1,14 @@
-from distutils.core import setup
+from setuptools import setup
+from otto import OTTO_VERSION, OTTO_DESC
 
 setup(
     name='otto',
-    version='v0.5',
+    version=OTTO_VERSION,
     author='Nic Roland',
     author_email='nicroland9@gmail.com',
     packages=['otto'],
-    data_files=[('otto_res', ['res/config.json', 'res/done.wav'])],
+    package_data={'otto': ['wavs/*.wav']},
+    zip_safe=False,
     scripts=['bin/otto'],
-    description='Automate your workflow with ease.',
-    #long_description=open('README.rst').read(),
+    description=OTTO_DESC,
 )
