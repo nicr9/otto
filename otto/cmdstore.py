@@ -12,7 +12,7 @@ variable names should be clarified and standardised:
 import os.path
 import imp
 from otto import LOCAL_PACK, LOCAL_CMDS_DIR, CMDS_FILE
-from otto.utils import info, bail, isOttoCmd, cmd_split, orange
+from otto.utils import info, blue, orange, bail, isOttoCmd, cmd_split
 from lament import ConfigFile
 
 
@@ -158,9 +158,14 @@ class CmdStore(object):
             full_name = "%s:%s" % (pack, cmd)
             doc_lines = [line.lstrip(' ') for line in docs.split('\n')]
 
-            print full_name
-            print "=" * len(full_name)
-            print '\n'.join(doc_lines)
+            info(full_name)
+            info('=' * len(full_name))
+
+            info('docstring')
+            info('---------')
+            blue('\n'.join(doc_lines))
+
+            ottocmd.usage()
 
     def export(self):
         return self._pack_dirs

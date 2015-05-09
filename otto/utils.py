@@ -291,12 +291,14 @@ class OttoCmd(object):
         blue("  $ otto %s %s" % (self._name(), ' '.join(args)))
         sys.exit()
 
-    def usage(self):
+    @classmethod
+    def usage(cls):
         """Print useage for this command."""
-        spec = getargspec(self.run).args
-        spec[0] = self.__class__.__name__.lower()
+        spec = getargspec(cls.run).args
+        spec[0] = cls.__class__.__name__.lower()
 
-        info("Usage:")
+        info('usage')
+        info('-----')
         blue("  $ otto %s" % ' '.join(spec))
 
 isOttoCmd = lambda cmd: OttoCmd in getattr(cmd, '__bases__', [])
