@@ -25,7 +25,7 @@ class OttoDispatcher(object):
         self.config.packs.list_cmds()
 
     def print_docs(self, cmd):
-        self.config.packs.docs(cmd)
+        self.config.packs.print_manpage(cmd)
 
     def handle(self, cmd, args):
         if not args:

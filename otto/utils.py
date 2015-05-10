@@ -301,6 +301,16 @@ class OttoCmd(object):
         info('-----')
         blue("  $ otto %s" % ' '.join(spec))
 
+    @classmethod
+    def docstring(cls):
+        docs = cls.__doc__
+        if docs is not None:
+            doc_lines = [line.lstrip(' ') for line in docs.split('\n')]
+
+            info('docstring')
+            info('---------')
+            blue('\n'.join(doc_lines))
+
 isOttoCmd = lambda cmd: OttoCmd in getattr(cmd, '__bases__', [])
 
 def _config_dir_and_path(config_path):
