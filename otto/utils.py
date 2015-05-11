@@ -294,12 +294,24 @@ class OttoCmd(object):
     @classmethod
     def usage(cls):
         """Print useage for this command."""
-        spec = getargspec(cls.run).args
-        spec[0] = cls.__class__.__name__.lower()
-
         info('usage')
         info('-----')
-        blue("  $ otto %s" % ' '.join(spec))
+        blue("  $ otto %s" % ' '.join(cls.cmd_spec()))
+
+    @classmethod
+    def cmd_spec(cls):
+        argspec = getargspec(cls.run)
+        spec = argspec.args
+
+        # Replace self with cmd name
+        cmd_name = re.search("'otto\.cmds\.(.*)'", str(cls)).group(1).lower()
+        spec[0] = cmd_name
+
+        # If *args, add [arg ...] to usage
+        if argspec.varargs:
+            spec.append('[arg ...]')
+
+        return spec
 
     @classmethod
     def docstring(cls):
