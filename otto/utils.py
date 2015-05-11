@@ -312,6 +312,15 @@ class OttoCmd(object):
         if argspec.varargs:
             spec.append('[arg ...]')
 
+        # TODO: This isn't guarenteed to work properly if argspec.varargs
+        if argspec.defaults:
+            num_defaults = len(argspec.defaults)
+            for indx, dflt in enumerate(argspec.defaults, -num_defaults):
+                spec[indx] += '=%s' % dflt
+
+        if argspec.keywords:
+            spec.append('[key=val ...]')
+
         return spec
 
     @classmethod
