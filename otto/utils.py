@@ -304,7 +304,8 @@ class OttoCmd(object):
         spec = argspec.args
 
         # Replace self with cmd name
-        cmd_name = re.search("'otto\.cmds\.(.*)'", str(cls)).group(1).lower()
+        cls_name = re.search("'(.*)'", str(cls)).group(1)
+        cmd_name = cls_name.split('.')[-1].lower()
         spec[0] = cmd_name
 
         # If *args, add [arg ...] to usage
