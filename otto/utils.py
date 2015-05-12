@@ -291,13 +291,47 @@ class OttoCmd(object):
         blue("  $ otto %s %s" % (self._name(), ' '.join(args)))
         sys.exit()
 
-    def usage(self):
+    @classmethod
+    def usage(cls):
         """Print useage for this command."""
-        spec = getargspec(self.run).args
-        spec[0] = self.__class__.__name__.lower()
+        info('usage')
+        info('-----')
+        blue("  $ otto %s" % ' '.join(cls.cmd_spec()))
 
-        info("Usage:")
-        blue("  $ otto %s" % ' '.join(spec))
+    @classmethod
+    def cmd_spec(cls):
+        argspec = getargspec(cls.run)
+        spec = argspec.args
+
+        # Replace self with cmd name
+        cls_name = re.search("'(.*)'", str(cls)).group(1)
+        cmd_name = cls_name.split('.')[-1].lower()
+        spec[0] = cmd_name
+
+        # If *args, add [arg ...] to usage
+        if argspec.varargs:
+            spec.append('[arg ...]')
+
+        # TODO: This isn't guarenteed to work properly if argspec.varargs
+        if argspec.defaults:
+            num_defaults = len(argspec.defaults)
+            for indx, dflt in enumerate(argspec.defaults, -num_defaults):
+                spec[indx] += '=%s' % dflt
+
+        if argspec.keywords:
+            spec.append('[key=val ...]')
+
+        return spec
+
+    @classmethod
+    def docstring(cls):
+        docs = cls.__doc__
+        if docs is not None:
+            doc_lines = [line.lstrip(' ') for line in docs.split('\n')]
+
+            info('docstring')
+            info('---------')
+            blue('\n'.join(doc_lines))
 
 isOttoCmd = lambda cmd: OttoCmd in getattr(cmd, '__bases__', [])
 

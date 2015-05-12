@@ -12,7 +12,7 @@ variable names should be clarified and standardised:
 import os.path
 import imp
 from otto import LOCAL_PACK, LOCAL_CMDS_DIR, CMDS_FILE
-from otto.utils import info, bail, isOttoCmd, cmd_split, orange
+from otto.utils import info, blue, orange, bail, isOttoCmd, cmd_split
 from lament import ConfigFile
 
 
@@ -144,23 +144,20 @@ class CmdStore(object):
         else:
             bail("Couldn't lookup %s, are you sure it's installed?" % name)
 
-    def docs(self, name):
+    def print_manpage(self, name):
         # Find OttoCmd class
         pack, cmd = self.lookup(name)
+        full_name = "%s:%s" % (pack, cmd)
+
         ottocmd = self.cmds_by_pack[pack][cmd]
         if isinstance(ottocmd, unicode):
             ottocmd = self._load_cmd(cmd, ottocmd)
 
-        docs = ottocmd.__doc__
-        if docs is None:
-            print "%s:%s doesn't seem to have a docstring." % (pack, cmd)
-        else:
-            full_name = "%s:%s" % (pack, cmd)
-            doc_lines = [line.lstrip(' ') for line in docs.split('\n')]
+        info(full_name)
+        info('=' * len(full_name))
 
-            print full_name
-            print "=" * len(full_name)
-            print '\n'.join(doc_lines)
+        ottocmd.docstring()
+        ottocmd.usage()
 
     def export(self):
         return self._pack_dirs
