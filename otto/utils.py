@@ -454,3 +454,9 @@ def debug_on():
         return ''
 
     shell = _debug
+
+def ssh_hosts():
+    ssh_config = os.path.expanduser('~/.ssh/config')
+    with open(ssh_config, 'r') as inp:
+        lines = inp.readlines()
+        return = [line[5:-1] for line in lines if line[0:5] == 'Host ']
