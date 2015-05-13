@@ -304,10 +304,9 @@ class OttoCmd(object):
         spec = argspec.args
 
         # Replace self with cmd name
-        cls_name = re.search("'(.*)'", str(cls)).group(1)
-        cmd_name = cls_name.split('.')[-1].lower()
-        spec[0] = cmd_name
+        spec[0] = cls._name()
 
+        # Add in the default values for some params
         if argspec.defaults:
             num_defaults = len(argspec.defaults)
             for indx, dflt in enumerate(argspec.defaults, -num_defaults):
