@@ -308,15 +308,14 @@ class OttoCmd(object):
         cmd_name = cls_name.split('.')[-1].lower()
         spec[0] = cmd_name
 
-        # If *args, add [arg ...] to usage
-        if argspec.varargs:
-            spec.append('[arg ...]')
-
-        # TODO: This isn't guarenteed to work properly if argspec.varargs
         if argspec.defaults:
             num_defaults = len(argspec.defaults)
             for indx, dflt in enumerate(argspec.defaults, -num_defaults):
                 spec[indx] += '=%s' % dflt
+
+        # If *args, add [arg ...] to usage
+        if argspec.varargs:
+            spec.append('[arg ...]')
 
         if argspec.keywords:
             spec.append('[key=val ...]')
