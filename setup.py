@@ -11,4 +11,8 @@ setup(
     zip_safe=False,
     scripts=['bin/otto'],
     description=OTTO_DESC,
+    install_requires=[
+        'lament',
+        'pydialog'
+        ,
 )
